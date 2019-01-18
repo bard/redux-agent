@@ -1,28 +1,50 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { connect } from 'react-redux'
+import { httpIntent } from './intent-reactor'
 
-class App extends Component {
-  render() {
+class App extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = { inputValue: '2' }
+  }
+
+  render () {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <label>Account ID: </label>
+        <input value={this.state.inputValue}
+          onChange={e => this.updateInputValue(e)} />
+        <button onClick={() => {
+          this.props.onAccountInfoWanted(this.state.inputValue)
+        }}>
+          Fetch Account Info
+        </button>
+        <div>{this.props.name}</div>
+        <div>
+          <img alt='' src={this.props.avatar} />
+        </div>
       </div>
-    );
+    )
+  }
+
+  updateInputValue (e) {
+    this.setState({ inputValue: e.target.value })
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  name: state.account && state.account.first_name,
+  avatar: state.account && state.account.avatar
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  onAccountInfoWanted: (accountId) => {
+    dispatch(httpIntent('ACCOUNT_INFO',
+                        `https://reqres.in/api/users/${accountId}`))
+  }
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
