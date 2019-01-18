@@ -93,6 +93,10 @@ export const createHttpReactor = (store) => {
           const res = await runRequest(intent.payload)
           store.dispatch({
             type: intent.meta.effect,
+            meta: {
+              reactor: 'http',
+              id: intent.meta.id
+            },
             payload: await res.json()
           })
           break
