@@ -1,7 +1,15 @@
 import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware, compose } from 'redux'
 
-import { httpIntentReducer } from './intent-reactor'
+import {
+  httpIntentReducer,
+  combineReactors,
+  createHttpReactor,
+  createDomReactor,
+  createHashReactor
+} from './lib/redux-reactor'
+
+import * as reactions from './reactions'
 import reducer from './reducer'
 
 const processEffectsEnhancer = (createStore) => (
@@ -43,6 +51,16 @@ export const configureStore = (initialState = {}) => {
     initialState,
     composedEnhancers
   )
+
+  const reactors = [
+    createHttpReactor(store),
+    createHashReactor(store, reactions.location),
+    createDomReactor(store, reactions.dom, document.getElementById('root'))
+  ]
+
+  const combinedReactors = combineReactors(...reactors)
+
+  store.subscribe(combinedReactors)
 
   return store
 }

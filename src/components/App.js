@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { httpIntent } from './intent-reactor'
+import { httpIntent } from '../lib/redux-reactor'
 
 class App extends React.Component {
   constructor (props) {
@@ -17,7 +17,7 @@ class App extends React.Component {
         <button onClick={() => {
           this.props.onAccountInfoWanted(this.state.inputValue)
         }}>
-          Fetch Account Info
+          Show Account
         </button>
         <div>{this.props.name}</div>
         <div>

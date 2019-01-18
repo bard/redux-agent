@@ -8,7 +8,11 @@ export {
   createDomReactor
 } from './dom'
 
-export const createReactorSequence = (...reactors) => {
+export {
+  createHashReactor
+} from './hash'
+
+export const combineReactors = (...reactors) => {
   let reacting = false
   return () => {
     if (!reacting) {
