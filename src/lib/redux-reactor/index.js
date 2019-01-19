@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------
 
 import Debug from 'debug'
-import { httpReducer } from './http'
+import { intentReducer } from './intents'
 
 // UTILITIES
 // ----------------------------------------------------------------------
@@ -13,9 +13,13 @@ const debug = Debug('reactor:sequence')
 // ----------------------------------------------------------------------
 
 export {
+  addIntent,
+  removeIntent
+} from './intents'
+
+export {
   createHttpReactor,
-  httpIntent,
-  addHttpIntent
+  httpIntent
 } from './http'
 
 export {
@@ -29,7 +33,7 @@ export {
 export const reactionProcessingEnhancer = (createStore) => (reducer, initialState, enhancer) => {
   const processedReducer = (state, action) => {
     const newState = reducer(state, action)
-    const effectProcessedState = httpReducer(newState, action)
+    const effectProcessedState = intentReducer(newState, action)
     return effectProcessedState
   }
 

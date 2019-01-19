@@ -1,9 +1,9 @@
-import { addHttpIntent, httpIntent } from './lib/redux-reactor'
+import { addIntent, httpIntent } from './lib/redux-reactor'
 
 export default (state, action) => {
   switch (action.type) {
     case 'ACCOUNT_INFO':
-      return addHttpIntent(state, accountInfoIntent(action.payload))
+      return addIntent(state, accountInfoIntent(action.payload))
 
     case 'ACCOUNT_INFO_EFFECT':
       return {
@@ -29,7 +29,7 @@ const route = (state, location) => {
   const m = location.match(/^\/accounts\/(\d+)$/)
   if (m) {
     const accountId = parseInt(m[1])
-    return addHttpIntent(state, accountInfoIntent(accountId))
+    return addIntent(state, accountInfoIntent(accountId))
   } else {
     return state
   }

@@ -1,8 +1,10 @@
-// UTILITIES
+// DEPENDENCIES
 // ----------------------------------------------------------------------
 
-const getHttpIntents = (state) =>
-      state.intents && state.intents.http
+import { getIntents } from './intents'
+
+// UTILITIES
+// ----------------------------------------------------------------------
 
 const diff = (arrayA, arrayB) => {
   arrayA = arrayA || []
@@ -42,43 +44,6 @@ export const httpIntent = (type, url, params = {}) => {
   }
 }
 
-export const addHttpIntent = (state, intent) => {
-  const httpIntents = getHttpIntents(state) || []
-  return {
-    ...state,
-    intents: {
-      ...state.intents,
-      http: [...httpIntents, intent]
-    }
-  }
-}
-
-export const removeHttpIntent = (state, id) => {
-  const i = state.intents.http.findIndex(intent => intent.meta.id === id)
-  return {
-    ...state,
-    intents: {
-      ...state.intents,
-      http: [
-        ...state.intents.http.slice(0, i),
-        ...state.intents.http.slice(i + 1)
-      ]
-    }
-  }
-}
-
-export const httpReducer = (state, action) => {
-  if (action.meta && action.meta.reactor === 'http') {
-    if (action.type.endsWith('_INTENT')) {
-      return addHttpIntent(state, action)
-    } else if (action.type.endsWith('_EFFECT')) {
-      return removeHttpIntent(state, action.meta.id)
-    }
-  } else {
-    return state
-  }
-}
-
 export const createHttpReactor = (store) => {
   let currentState
 
@@ -106,7 +71,7 @@ export const createHttpReactor = (store) => {
   }
 
   return () => {
-    let nextState = getHttpIntents(store.getState())
+    let nextState = getIntents(store.getState(), 'http')
     if (nextState !== currentState) {
       applyDiff(diff(currentState, nextState))
       currentState = nextState
