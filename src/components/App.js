@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { httpIntent } from '../lib/redux-reactor'
 
 class App extends React.Component {
   constructor (props) {
@@ -39,8 +38,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   onAccountInfoWanted: (accountId) => {
-    dispatch(httpIntent('ACCOUNT_INFO',
-                        `https://reqres.in/api/users/${accountId}`))
+    dispatch({ type: 'ACCOUNT_INFO', payload: accountId })
   }
 })
 

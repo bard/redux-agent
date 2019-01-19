@@ -14,7 +14,8 @@ const debug = Debug('reactor:sequence')
 
 export {
   createHttpReactor,
-  httpIntent
+  httpIntent,
+  addHttpIntent
 } from './http'
 
 export {
