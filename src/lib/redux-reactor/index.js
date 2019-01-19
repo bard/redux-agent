@@ -18,8 +18,8 @@ export {
 } from './http'
 
 export {
-  createDomReactor
-} from './dom'
+  createReactReactor
+} from './react'
 
 export {
   createHashReactor

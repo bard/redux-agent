@@ -5,8 +5,8 @@ import {
   httpIntentReducer,
   combineReactors,
   createHttpReactor,
-  createDomReactor,
-  createHashReactor
+  createReactReactor,
+  createHashReactor,
 } from './lib/redux-reactor'
 
 import * as reactions from './reactions'
@@ -55,7 +55,7 @@ export const configureStore = (initialState = {}) => {
   const reactors = [
     createHttpReactor(store),
     createHashReactor(store, reactions.location),
-    createDomReactor(store, reactions.dom, document.getElementById('root'))
+    createReactReactor(store, reactions.react, document.getElementById('root'))
   ]
 
   const combinedReactors = combineReactors(...reactors)

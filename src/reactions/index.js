@@ -1,2 +1,2 @@
 export { default as location } from './location'
-export { default as dom } from './dom'
+export { default as react } from './react'
