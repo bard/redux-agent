@@ -23,7 +23,7 @@ export {
 
 export {
   createHashReactor
-} from './location'
+} from './location-hash'
 
 export const reactionProcessingEnhancer = (createStore) => (reducer, initialState, enhancer) => {
   const processedReducer = (state, action) => {
