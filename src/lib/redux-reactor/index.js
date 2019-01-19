@@ -1,3 +1,16 @@
+// DEPENDENCIES
+// ----------------------------------------------------------------------
+
+import Debug from 'debug'
+
+// UTILITIES
+// ----------------------------------------------------------------------
+
+const debug = Debug('reactor:sequence')
+
+// API
+// ----------------------------------------------------------------------
+
 export {
   createHttpReactor,
   httpIntentReducer,
@@ -10,15 +23,19 @@ export {
 
 export {
   createHashReactor
-} from './hash'
+} from './location'
 
 export const combineReactors = (...reactors) => {
   let reacting = false
   return () => {
     if (!reacting) {
+      debug('initiating')
       reacting = true
-      reactors.forEach(reactor => reactor.call())
+      reactors.forEach(reactor => {
+        reactor.call()
+      })
       reacting = false
+      debug('terminated')
     }
   }
 }

@@ -1,7 +1,7 @@
 export default (state) => {
   if (state.account === null) {
-    return '#/'
+    return '/'
   } else {
-    return '#/accounts/' + state.account.id
+    return '/accounts/' + state.account.id
   }
 }
