@@ -2,27 +2,15 @@ import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware, compose } from 'redux'
 
 import {
-  httpIntentReducer,
   combineReactors,
   createHttpReactor,
   createReactReactor,
   createHashReactor,
+  reactionProcessingEnhancer
 } from './lib/redux-reactor'
 
 import * as reactions from './reactions'
 import reducer from './reducer'
-
-const processEffectsEnhancer = (createStore) => (
-  reducer, initialState, enhancer
-) => {
-  const processedReducer = (state, action) => {
-    const newState = reducer(state, action)
-    const effectProcessedState = httpIntentReducer(newState, action)
-    return effectProcessedState
-  }
-
-  return createStore(processedReducer, initialState, enhancer)
-}
 
 export const configureStore = (initialState = {}) => {
   const middleware = [
@@ -30,7 +18,7 @@ export const configureStore = (initialState = {}) => {
   ]
 
   const enhancers = [
-    processEffectsEnhancer
+    reactionProcessingEnhancer
   ]
 
   if (process.env.NODE_ENV === 'development') {

@@ -2,6 +2,7 @@
 // ----------------------------------------------------------------------
 
 import Debug from 'debug'
+import { httpReducer } from './http'
 
 // UTILITIES
 // ----------------------------------------------------------------------
@@ -13,7 +14,6 @@ const debug = Debug('reactor:sequence')
 
 export {
   createHttpReactor,
-  httpIntentReducer,
   httpIntent
 } from './http'
 
@@ -24,6 +24,16 @@ export {
 export {
   createHashReactor
 } from './location'
+
+export const reactionProcessingEnhancer = (createStore) => (reducer, initialState, enhancer) => {
+  const processedReducer = (state, action) => {
+    const newState = reducer(state, action)
+    const effectProcessedState = httpReducer(newState, action)
+    return effectProcessedState
+  }
+
+  return createStore(processedReducer, initialState, enhancer)
+}
 
 export const combineReactors = (...reactors) => {
   let reacting = false

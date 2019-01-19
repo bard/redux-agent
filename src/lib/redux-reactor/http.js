@@ -67,7 +67,7 @@ export const removeHttpIntent = (state, id) => {
   }
 }
 
-export const httpIntentReducer = (state, action) => {
+export const httpReducer = (state, action) => {
   if (action.meta && action.meta.reactor === 'http') {
     if (action.type.endsWith('_INTENT')) {
       return addHttpIntent(state, action)
