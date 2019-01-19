@@ -3,9 +3,9 @@ import { createStore, applyMiddleware, compose } from 'redux'
 
 import {
   combineReactors,
-  createHttpReactor,
+  // createHttpReactor,
   createReactReactor,
-  createHashReactor,
+//  createHashReactor,
   reactionProcessingEnhancer
 } from './lib/redux-reactor'
 
@@ -41,8 +41,8 @@ export const configureStore = (initialState = {}) => {
   )
 
   const reactors = [
-    createHttpReactor(store),
-    createHashReactor(store, reactions.location),
+//    createHttpReactor(store),
+//    createHashReactor(store, reactions.location),
     createReactReactor(store, reactions.react, document.getElementById('root'))
   ]
 
