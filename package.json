@@ -1,28 +1,24 @@
 {
-  "name": "redux-workers-playground",
-  "version": "0.1.0",
   "private": true,
+  "name": "redux-reactor",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "license": "MIT",
   "dependencies": {
-    "react": "^16.7.0",
+    "debug": "3"
+  },
+  "devDependencies": {
+    "@types/debug": "^0.0.31",
+    "@types/jquery": "^3.3.29",
+    "@types/react": "^16.7.22",
+    "@types/react-dom": "^16.0.11",
     "react-dom": "^16.7.0",
-    "react-redux": "^6.0.0",
-    "react-scripts": "2.1.2",
-    "redux": "^4.0.1",
-    "redux-logger": "^3.0.6"
+    "typescript": "^3.3.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "rm -rf ./lib && tsc"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "peerDependencies": {
+    "react": "^16.7.0"
+  }
 }
