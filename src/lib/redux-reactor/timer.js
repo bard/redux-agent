@@ -1,30 +1,64 @@
-const createGenericReactor = (selector, handleChange) => (store) => {
+// DEPENDENCIES
+// ----------------------------------------------------------------------
+
+import Debug from 'debug'
+import { getIntents } from './intents'
+
+// STATE
+// ----------------------------------------------------------------------
+
+const timers = {}
+
+// UTILITIES
+// ----------------------------------------------------------------------
+
+const debug = Debug('reactor:timer')
+
+// API
+// ----------------------------------------------------------------------
+
+export const createTimerReactor = (store) => {
   let currentState
   return () => {
-    let nextState = selector(store.getState())
+    let nextState = getIntents(store.getState(), 'timer')
     if (nextState !== currentState) {
       currentState = nextState
-      handleChange(currentState, store.dispatch)
+      handleStateChange(currentState, store.dispatch)
     }
   }
 }
 
-export const createTimerReactor = createGenericReactor(
-  (state) => state.intents.timer,
-  (state, dispatch) => {
-    state.forEach(async intent => {
-      dispatch({
-        type: 'timer/INTENT_PICKED',
-        payload: intent.id
-      })
-
-      const { url, method, actionType } = intent
-      const res = await window.fetch(url, { method })
-      const data = await res.json()
-      dispatch({
-        type: actionType,
-        payload: data
-      })
-    })
+export const timerIntent = (type, interval) => {
+  return {
+    type: type + '_INTENT',
+    meta: {
+      id: intentCounter++,
+      reactor: 'timer',
+      effect: type + '_EFFECT'
+    },
+    payload: {
+      interval
+    }
   }
-)
+}
+
+// INTERNALS
+// ----------------------------------------------------------------------
+
+let intentCounter = 0
+
+// should be const handleStateChange = (changes, dispatch) => {
+const handleStateChange = (currentState, dispatch) => {
+  debug('responding to state change')
+
+  currentState.forEach(intent => {
+    timers[intent.meta.id] = setInterval(() => {
+      dispatch({
+        type: intent.meta.effect,
+        meta: {
+          id: intent.meta.id
+        }
+      })
+    }, intent.payload.interval)
+  })
+}

@@ -23,6 +23,11 @@ export {
 } from './http'
 
 export {
+  createTimerReactor,
+  timerIntent
+} from './timer'
+
+export {
   createReactReactor
 } from './react'
 

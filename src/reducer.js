@@ -1,9 +1,25 @@
-import { addIntent, httpIntent } from './lib/redux-reactor'
+// DEPENDENCIES
+// ----------------------------------------------------------------------
+
+import {
+  addIntent,
+  removeIntent,
+  httpIntent,
+  timerIntent } from './lib/redux-reactor'
+
+// API
+// ----------------------------------------------------------------------
 
 export default (state, action) => {
   switch (action.type) {
     case 'ACCOUNT_INFO':
       return addIntent(state, accountInfoIntent(action.payload))
+
+    case 'POLL_START':
+      return addIntent(state, pollIntent())
+
+    case 'POLL_STOP':
+      return removeIntent(state, 'poll', action.meta.id)
 
     case 'ACCOUNT_INFO_EFFECT':
       return {
@@ -24,6 +40,12 @@ export default (state, action) => {
 
 const accountInfoIntent = (accountId) =>
       httpIntent('ACCOUNT_INFO', `https://reqres.in/api/users/${accountId}`)
+
+const pollIntent = () =>
+      timerIntent('POLL', 3000)
+
+// LOGIC
+// ----------------------------------------------------------------------
 
 const route = (state, location) => {
   const m = location.match(/^\/accounts\/(\d+)$/)

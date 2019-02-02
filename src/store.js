@@ -6,6 +6,7 @@ import {
   createHttpReactor,
   createReactReactor,
   createHashReactor,
+  createTimerReactor,
   reactionProcessingEnhancer
 } from './lib/redux-reactor'
 
@@ -43,7 +44,8 @@ export const configureStore = (initialState = {}) => {
   const reactors = [
     createHttpReactor(store),
     createHashReactor(store, reactions.location),
-    createReactReactor(store, reactions.react, document.getElementById('root'))
+    createReactReactor(store, reactions.react, document.getElementById('root')),
+    createTimerReactor(store)
   ]
 
   const combinedReactors = combineReactors(...reactors)

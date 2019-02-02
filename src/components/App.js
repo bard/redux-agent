@@ -10,17 +10,28 @@ class App extends React.Component {
   render () {
     return (
       <div>
-        <label>Account ID: </label>
-        <input value={this.state.inputValue}
-          onChange={e => this.updateInputValue(e)} />
-        <button onClick={() => {
-          this.props.onAccountInfoWanted(this.state.inputValue)
-        }}>
-          Show Account
-        </button>
-        <div>{this.props.name}</div>
         <div>
-          <img alt='' src={this.props.avatar} />
+          <h3>Example: Timer</h3>
+          <button onClick={() => { this.props.onPollStartWanted() }}>
+            Start polling
+          </button>
+          &nbsp;
+          <button onClick={() => { this.props.onPollStopWanted() }}>
+            Stop polling
+          </button>
+          <hr />
+        </div>
+        <div>
+          <h3>Example: HTTP</h3>
+          <label>Account ID: </label>
+          <input value={this.state.inputValue} onChange={e => this.updateInputValue(e)} />
+          <button onClick={() => { this.props.onAccountInfoWanted(this.state.inputValue) }}>
+            Show Account
+          </button>
+          <div>{this.props.name}</div>
+          <div>
+            <img alt='' src={this.props.avatar} />
+          </div>
         </div>
       </div>
     )
@@ -39,6 +50,12 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   onAccountInfoWanted: (accountId) => {
     dispatch({ type: 'ACCOUNT_INFO', payload: accountId })
+  },
+  onPollStartWanted: () => {
+    dispatch({ type: 'POLL_START' })
+  },
+  onPollStopWanted: () => {
+    dispatch({ type: 'POLL_STOP' })
   }
 })
 
