@@ -13,7 +13,15 @@ import {
 export default (state, action) => {
   switch (action.type) {
     case 'ACCOUNT_INFO':
-      return addIntent(state, accountInfoIntent(action.payload))
+      return {
+        ...state,
+        account: {
+          $http: {
+            url: `https://reqres.in/api/users/${action.payload}`,
+            effect: 'ACCOUNT_INFO_EFFECT'
+          }
+        }
+      }
 
     case 'POLL_START':
       return addIntent(state, pollIntent())
@@ -25,6 +33,18 @@ export default (state, action) => {
       return {
         ...state,
         account: action.payload.data
+      }
+
+    case 'TIMER_START':
+      return {
+        ...state,
+        timerActive: true
+      }
+
+    case 'TIMER_STOP':
+      return {
+        ...state,
+        timerActive: false
       }
 
     case 'hash/CHANGE':
