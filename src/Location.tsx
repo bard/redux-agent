@@ -22,6 +22,7 @@ class Location extends Component<Props, any> {
   componentDidMount() {
     debug('componentDidMount')
     window.addEventListener('hashchange', this.locationDidChange)
+    this.updateLocation()
     this.locationDidChange()
   }
 
@@ -32,18 +33,22 @@ class Location extends Component<Props, any> {
   componentDidUpdate(prevProps: Props) {
     debug('componentDidUpdate')
     if (prevProps.location !== this.props.location) {
-      debug(`updating location to ${this.props.location}`)
-      this.withLocationListenerPaused(() => {
-        window.location.hash = '#' + this.props.location
-      })
+      this.updateLocation()
     }
   }
-  
+
   render() {
     return null
   }
 
   // ----------------------------------------------------------------------
+
+  updateLocation() {
+    debug(`updating location to ${this.props.location}`)
+    this.withLocationListenerPaused(() => {
+      window.location.hash = '#' + this.props.location
+    })
+  }
 
   locationDidChange() {
     const location = window.location.hash.substr(1) || '/'
