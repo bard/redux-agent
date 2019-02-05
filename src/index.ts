@@ -1,4 +1,5 @@
 import Location from './Location'
+import Route from './Route'
 import DocumentTitle from './DocumentTitle'
 import Http, {
   TrackedHttpRequest,
@@ -13,6 +14,7 @@ import Socket, {
 // ----------------------------------------------------------------------
 
 export { Location,
+         Route,
          DocumentTitle,
          Socket,
          SocketState,

@@ -1,16 +1,13 @@
+import React from 'react'
+import Path from 'path-parser'
 import createDebug from 'debug'
 import { Component } from 'react'
 
 const debug = createDebug('reactor:Location')
 
-// ----------------------------------------------------------------------
-
 interface Props {
   location: string
-  onLocationChange: (location: string) => void
 }
-
-// ----------------------------------------------------------------------
 
 class Location extends Component<Props, any> {
   constructor(props: Props) {
@@ -22,7 +19,11 @@ class Location extends Component<Props, any> {
   componentDidMount() {
     debug('componentDidMount')
     window.addEventListener('hashchange', this.locationDidChange)
-    this.updateLocation()
+    if (!window.location.hash) {
+      // If no hash present, initialize it from state. If present, don't change,
+      // since it expresses an intent
+      this.updateLocation()
+    }
     this.locationDidChange()
   }
 
@@ -44,15 +45,25 @@ class Location extends Component<Props, any> {
   // ----------------------------------------------------------------------
 
   updateLocation() {
-    debug(`updating location to ${this.props.location}`)
-    this.withLocationListenerPaused(() => {
-      window.location.hash = '#' + this.props.location
-    })
+    const newLocation = '#' + this.props.location
+    if (window.location.hash === newLocation) {
+      debug(`location already at ${newLocation}, skipping update`)
+    } else {
+      debug(`updating location to ${newLocation}`)
+      this.withLocationListenerPaused(() => {
+        window.location.hash = '#' + this.props.location
+      })
+    }
   }
 
   locationDidChange() {
     const location = window.location.hash.substr(1) || '/'
-    this.props.onLocationChange(location)
+    debug('locationDidChange', location)
+    const match = this.findMatchingRoute(
+      location, React.Children.toArray(this.props.children))
+    if (match) {
+        match.onMatch(match.params)
+    }
   }
 
   withLocationListenerPaused(callback: () => void) {
@@ -61,6 +72,22 @@ class Location extends Component<Props, any> {
     window.setTimeout(() =>
       window.addEventListener('hashchange', this.locationDidChange))
   }
+
+  findMatchingRoute(location: string, routes: any[]) {
+    // XXX generate Path objects somewhere and just use them here
+    return routes.reduce(
+      (match, { props: { pattern, onMatch }}) => {
+        if (match) {
+          return match
+        } else {
+          const params = new Path(pattern).test(location)
+          if (params) {
+            return { pattern, params, onMatch }
+          }
+        }
+      }, null)
+  }
 }
 
 export default Location
+
