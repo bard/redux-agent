@@ -20,8 +20,9 @@ class HashLocation extends Component<Props, any> {
     debug('componentDidMount')
     window.addEventListener('hashchange', this.locationDidChange)
     if (!window.location.hash) {
-      // If no hash present, initialize it from state. If present, don't change,
-      // since it expresses an intent
+      debug('no hash present, setting it')
+      // If no hash present, initialize location from state (otherwise
+      // keep it as-is and let it trigger an action)
       this.updateLocation()
     }
     this.locationDidChange()
