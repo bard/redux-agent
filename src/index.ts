@@ -1,4 +1,4 @@
-import Location from './Location'
+import HashLocation from './HashLocation'
 import Route from './Route'
 import DocumentTitle from './DocumentTitle'
 import Http, {
@@ -13,7 +13,7 @@ import Socket, {
 
 // ----------------------------------------------------------------------
 
-export { Location,
+export { HashLocation,
          Route,
          DocumentTitle,
          Socket,

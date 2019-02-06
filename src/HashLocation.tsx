@@ -3,13 +3,13 @@ import Path from 'path-parser'
 import createDebug from 'debug'
 import { Component } from 'react'
 
-const debug = createDebug('reactor:Location')
+const debug = createDebug('reactor:HashLocation')
 
 interface Props {
   location: string
 }
 
-class Location extends Component<Props, any> {
+class HashLocation extends Component<Props, any> {
   constructor(props: Props) {
     super(props)
     debug('constructor')
@@ -89,5 +89,4 @@ class Location extends Component<Props, any> {
   }
 }
 
-export default Location
-
+export default HashLocation
