@@ -21,21 +21,6 @@ export default class Http extends Component<Props, any> {
     this.requestStateDidChange = this.requestStateDidChange.bind(this)
   }
 
-  requestStateDidChange(id: number,
-                        effect: TrackedRequestEffects,
-                        params: any,
-                        state: TrackedRequestState,
-                        result: any) {
-    this.props.onRequestStateChange({
-      id,
-      state,
-      effect,
-      params,
-      data: state === 'success' && result,
-      error: state === 'failure' && result
-    })
-  }
-
   render() {
     const requests = this.props.outbox.map((request) =>
       <FetchHttpRequest id={request.id}
@@ -49,6 +34,21 @@ export default class Http extends Component<Props, any> {
                             result)}/>)
 
     return <Fragment>{ requests }</Fragment>
+  }
+
+  private requestStateDidChange(id: number,
+                        effect: TrackedRequestEffects,
+                        params: any,
+                        state: TrackedRequestState,
+                        result: any) {
+    this.props.onRequestStateChange({
+      id,
+      state,
+      effect,
+      params,
+      data: state === 'success' && result,
+      error: state === 'failure' && result
+    })
   }
 }
 

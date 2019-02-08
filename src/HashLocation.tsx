@@ -43,9 +43,7 @@ class HashLocation extends Component<Props, any> {
     return null
   }
 
-  // ----------------------------------------------------------------------
-
-  updateLocation() {
+  private updateLocation() {
     const newLocation = '#' + this.props.location
     if (window.location.hash === newLocation) {
       debug(`location already at ${newLocation}, skipping update`)
@@ -57,7 +55,7 @@ class HashLocation extends Component<Props, any> {
     }
   }
 
-  locationDidChange() {
+  private locationDidChange() {
     const location = window.location.hash.substr(1) || '/'
     debug('locationDidChange', location)
     const match = this.findMatchingRoute(
@@ -67,14 +65,14 @@ class HashLocation extends Component<Props, any> {
     }
   }
 
-  withLocationListenerPaused(callback: () => void) {
+  private withLocationListenerPaused(callback: () => void) {
     window.removeEventListener('hashchange', this.locationDidChange)
     callback()
     window.setTimeout(() =>
       window.addEventListener('hashchange', this.locationDidChange))
   }
 
-  findMatchingRoute(location: string, routes: any[]) {
+  private findMatchingRoute(location: string, routes: any[]) {
     // XXX generate Path objects somewhere and just use them here
     return routes.reduce(
       (match, { props: { pattern, onMatch }}) => {

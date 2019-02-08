@@ -69,6 +69,14 @@ export default class Socket extends Component<Props, any> {
     this.primus.on('end', this.primusDidDisconnect)
     this.primus.on('error', this.primusDidError)
   }
+  
+  componentWillUnmount() {
+    debug('componentWillUnmount')
+    this.primus.off('incoming::open', this.primusDidConnect)
+    this.primus.off('data', this.primusDidReceiveData)
+    this.primus.off('end', this.primusDidDisconnect)
+    this.primus.off('error', this.primusDidError)
+  }
 
   componentDidUpdate(prevProps: Props) {
     debug('componentDidUpdate')
@@ -91,14 +99,6 @@ export default class Socket extends Component<Props, any> {
     }
   }
 
-  componentWillUnmount() {
-    debug('componentWillUnmount')
-    this.primus.off('incoming::open', this.primusDidConnect)
-    this.primus.off('data', this.primusDidReceiveData)
-    this.primus.off('end', this.primusDidDisconnect)
-    this.primus.off('error', this.primusDidError)
-  }
-
   render() {
     debug('render')
     //if (!online) exit
@@ -116,9 +116,7 @@ export default class Socket extends Component<Props, any> {
     )
   }
 
-  // ----------------------------------------------------------------------
-
-  primusDidError(err: any) {
+  private primusDidError(err: any) {
     debug('primus error code ' + err.code, err)
     if (err.code === 1002) { // cannot connect to server
       // XXX change connection state?
@@ -127,20 +125,20 @@ export default class Socket extends Component<Props, any> {
     }
   }
 
-  primusDidConnect() {
+  private primusDidConnect() {
     this.props.onStateChange('connected')
   }
 
-  primusDidDisconnect() {
+  private primusDidDisconnect() {
     // XXX might check `primus.online` here
     this.props.onStateChange('disconnected')
   }
 
-  primusDidReceiveData(data: SocketMessage) {
+  private primusDidReceiveData(data: SocketMessage) {
     this.props.onMessageReceived(data)
   }
-
-  messageWasSent(id: number) {
+  
+  private messageWasSent(id: number) {
     this.props.onMessageSent(id)
   }
 }
