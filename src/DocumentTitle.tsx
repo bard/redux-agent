@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 
 // ----------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ interface Props {
   title: string
 }
 
-class DocumentTitle extends Component<Props, any> {
+class DocumentTitle extends React.Component<Props, any> {
   render() {
     document.title = (this.props.prefix || '') +
                      this.props.title +

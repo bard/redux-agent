@@ -3,7 +3,7 @@ interface Props {
   onMatch(params: any): void
 }
 
-const Route = ({ pattern, onMatch }: Props) => (
+const Route = (_: Props) => (
   null
 )
 

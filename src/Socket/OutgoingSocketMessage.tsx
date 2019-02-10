@@ -1,21 +1,23 @@
+import createDebug from 'debug'
 import { Component } from 'react'
+
+const debug = createDebug('reactor:Socket:OutgoingSocketMessage')
 
 // ----------------------------------------------------------------------
 
 interface Props {
   id: number
   data: any
-  primus: any
-  onSent: (id: number) => void
+  send(data: any): void
+  onSent(id: number): void
 }
 
 // ----------------------------------------------------------------------
 
 class OutgoingSocketMessage extends Component<Props, any> {
   componentDidMount() {
-    // XXX doing this here to prevent accidental re-renders; but should
-    // technically be in render
-    this.props.primus.write(this.props.data)
+    debug(`sending with id ${this.props.id}`, this.props.data)
+    this.props.send(this.props.data)
     this.props.onSent(this.props.id)
   }
 

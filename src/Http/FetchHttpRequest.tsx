@@ -1,8 +1,8 @@
+import createDebug from 'debug'
 import { Component } from 'react'
-
 import { TrackedRequestState } from './types'
 
-// ----------------------------------------------------------------------
+const debug = createDebug('reactor:FetchHttpRequest')
 
 interface Props {
   id: number
@@ -12,6 +12,8 @@ interface Props {
 
 class HttpRequest extends Component<Props, any> {
   componentDidMount() {
+    debug('componentDidMount')
+    
     const { url, ...params } = this.props.params
     fetch(url, {
       headers: {
