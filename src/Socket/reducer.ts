@@ -1,10 +1,9 @@
-import produce from 'immer'
+import produce, { isDraft } from 'immer'
 import { SocketState } from './types'
 
 const createReducer = ({
   stateKey = 'socket',
-  actionPrefix = 'SOCKET_',
-  immer = false
+  actionPrefix = 'SOCKET_'
 } = {}) => {
   const getStateSlice = (state: any): SocketState => state[stateKey]
 
@@ -33,11 +32,8 @@ const createReducer = ({
     }
   })
 
-  // XXX instead of asking the user to tell us whether he's using
-  // immer, we should be using isDraft, however this doesn't work at
-  // the moment for some reason
-  const withImmer = (state: any, worker: any) => immer
-    ? worker(state)
+  const withImmer = (state: any, worker: any) => isDraft(state)
+    ? worker(state, worker)
     : produce(state, worker)
 
   const addToOutbox = (state: any, data: any) => withImmer(state, (draft: any) => {
