@@ -1,5 +1,6 @@
 import createDebug from 'debug'
 import React from 'react'
+import { connect } from 'react-redux'
 import Fragment from '../util/Fragment'
 import { SocketConnectionState,
          TrackedSocketMessage,
@@ -9,23 +10,25 @@ import OutgoingSocketMessage from './OutgoingSocketMessage'
 
 const debug = createDebug('reactor:Socket2')
 
-interface Props {
+interface PropsFromUser {
   connectionUrl: string
-  desiredState: null | SocketConnectionState
-  outbox: TrackedSocketMessage[]
-  actionPrefix: string
   onMessageReceived(data: SocketMessage): void
-  onGlobalAction(action: any): void
 }
 
-export default class Socket extends React.Component<Props, {}> {  
-  static defaultProps = { actionPrefix: 'SOCKET_' }
+interface PropsFromState {
+  lastMessageId: number // XXX mark as readonly
+  desiredState: null | SocketConnectionState
+  outbox: TrackedSocketMessage[]
+}
 
-  static getStateSlice(state: any, stateKey: string = 'socket'): SocketState {
-    // XXX do runtime check with developer-friendly error message here
-    return state[stateKey]
-  }
+interface PropsFromDispatch {
+  stateChanged(newConnectionState: SocketConnectionState): void
+  messageSent(id: number): void
+}
 
+type Props = PropsFromUser & PropsFromState & PropsFromDispatch
+
+class Socket extends React.Component<Props, {}> {
   private socket: WebSocket = null
   
   private hotReloading: boolean = false
@@ -77,10 +80,7 @@ export default class Socket extends React.Component<Props, {}> {
   }
   
   private messageWasSent(id: number) {
-    this.props.onGlobalAction({
-      type: this.props.actionPrefix + 'MESSAGE_SENT',
-      payload: id
-    })
+    this.props.messageSent(id)
   }
 
   private setupHMR() {
@@ -130,22 +130,17 @@ export default class Socket extends React.Component<Props, {}> {
   }
 
   private createSocket() {
+    debug('createSocket')
     this.socket = new WebSocket(this.props.connectionUrl)
     this.socket.close
     this.socket.sendJSON = function(data: any) {
       return this.send(JSON.stringify(data))
     }
     this.socket.addEventListener('open', () => {
-      this.props.onGlobalAction({
-        type: this.props.actionPrefix + 'STATE_CHANGE',
-        payload: 'connected'
-      })
+      this.props.stateChanged('connected')
     })
     this.socket.addEventListener('close', () => {
-      this.props.onGlobalAction({
-        type: this.props.actionPrefix + 'STATE_CHANGE',
-        payload: 'disconnected'
-      })
+      this.props.stateChanged('disconnected')
     })
     this.socket.addEventListener('message', ({ data }: MessageEvent) => {
       if (typeof data !== 'string') {
@@ -155,4 +150,38 @@ export default class Socket extends React.Component<Props, {}> {
       this.props.onMessageReceived(message)
     })
   }
+}
+
+export const createSocketReactor = ({
+  actionPrefix = 'SOCKET_', stateKey = 'socket'
+} = {}) => {
+
+  const getStateSlice = (state: any): SocketState => (state[stateKey] || {})
+
+  const mapStateToProps = (state: any): PropsFromState => ({
+    lastMessageId: getStateSlice(state).lastMessageId,
+    outbox: getStateSlice(state).outbox,
+    desiredState: getStateSlice(state).desiredState
+  })
+
+  const mapDispatchToProps = (dispatch: any): PropsFromDispatch => ({
+    stateChanged(newConnectionState: SocketConnectionState) {
+      dispatch({
+        type: actionPrefix + 'STATE_CHANGED',
+        payload: newConnectionState
+      })
+    },
+    
+    messageSent(id: number) {
+      dispatch({
+        type: actionPrefix + 'MESSAGE_SENT',
+        payload: id
+      })
+    }
+  })
+
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Socket)
 }

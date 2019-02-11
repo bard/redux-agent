@@ -1,5 +1,6 @@
 import createDebug from 'debug'
 import React from 'react'
+import { connect } from 'react-redux'
 import Fragment from '../util/Fragment'
 import { SocketConnectionState,
          TrackedSocketMessage,
@@ -16,26 +17,28 @@ if (!('Primus' in window)) {
 
 const debug = createDebug('reactor:Primus')
 
-interface Props {
-  desiredState: null | SocketConnectionState
-  outbox: TrackedSocketMessage[]
-  actionPrefix: string
+interface PropsFromUser {
   onMessageReceived(data: SocketMessage): void
-  onGlobalAction(action: any): void
 }
 
-export default class Socket extends React.Component<Props, {}> {  
-  static defaultProps = { actionPrefix: 'SOCKET_' }
+interface PropsFromState {
+  lastMessageId: number // XXX mark as readonly
+  desiredState: null | SocketConnectionState
+  outbox: TrackedSocketMessage[]
+}
 
-  static getStateSlice(state: any, stateKey: string = 'socket'): SocketState {
-    // XXX do runtime check with developer-friendly error message here
-    return state[stateKey]
-  }
+interface PropsFromDispatch {
+  stateChanged(newConnectionState: SocketConnectionState): void
+  messageSent(id: number): void
+}
 
+type Props = PropsFromUser & PropsFromState & PropsFromDispatch
+
+class Socket extends React.Component<Props, {}> {
   private socket: any = null
-  
+
   private hotReloading: boolean = false
-  
+
   constructor(props: Props) {
     super(props)
     debug('constructor')
@@ -64,7 +67,7 @@ export default class Socket extends React.Component<Props, {}> {
 
   render() {
     const { outbox = [] } = this.props
-    
+
     return (
       <Fragment>
         { outbox.map(message =>
@@ -81,12 +84,9 @@ export default class Socket extends React.Component<Props, {}> {
   private send(data: any) {
     this.socket.sendJSON(data)
   }
-  
+
   private messageWasSent(id: number) {
-    this.props.onGlobalAction({
-      type: this.props.actionPrefix + 'MESSAGE_SENT',
-      payload: id
-    })
+    this.props.messageSent(id)
   }
 
   private setupHMR() {
@@ -143,7 +143,7 @@ export default class Socket extends React.Component<Props, {}> {
         retries: 50
       },
       timeout: 20000 // XXX weird stuff happens when too low and timeout happens
-    }) 
+    })
 
     this.socket.OPEN = Primus.OPEN
     this.socket.CLOSED = Primus.CLOSED
@@ -160,19 +160,47 @@ export default class Socket extends React.Component<Props, {}> {
       }
     })
     this.socket.on('incoming::open', () => {
-      this.props.onGlobalAction({
-        type: this.props.actionPrefix + 'STATE_CHANGE',
-        payload: 'connected'
-      })
+      this.props.stateChanged('connected')
     })
     this.socket.on('close', () => {
-      this.props.onGlobalAction({
-        type: this.props.actionPrefix + 'STATE_CHANGE',
-        payload: 'disconnected'
-      })
+      this.props.stateChanged('disconnected')
     })
     this.socket.on('data', (data: any) => {
       this.props.onMessageReceived(data)
     })
   }
+}
+
+export const createPrimusReactor = ({
+  actionPrefix = 'SOCKET_', stateKey = 'socket'
+} = {}) => {
+
+  const getStateSlice = (state: any): SocketState => (state[stateKey] || {})
+
+  const mapStateToProps = (state: any): PropsFromState => ({
+    lastMessageId: getStateSlice(state).lastMessageId,
+    outbox: getStateSlice(state).outbox,
+    desiredState: getStateSlice(state).desiredState
+  })
+
+  const mapDispatchToProps = (dispatch: any): PropsFromDispatch => ({
+    stateChanged(newConnectionState: SocketConnectionState) {
+      dispatch({
+        type: actionPrefix + 'STATE_CHANGED',
+        payload: newConnectionState
+      })
+    },
+
+    messageSent(id: number) {
+      dispatch({
+        type: actionPrefix + 'MESSAGE_SENT',
+        payload: id
+      })
+    }
+  })
+
+  return connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Socket)
 }
