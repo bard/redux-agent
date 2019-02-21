@@ -13,29 +13,42 @@ interface Props {
 class HttpRequest extends Component<Props, any> {
   componentDidMount() {
     debug('componentDidMount')
-    
-    const { url, ...params } = this.props.params
-    fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        ...params.headers,
-      },
-      credentials: 'same-origin',
-      ...params
-    }).then(response => {
-      if (!response.ok) {
-        throw response.status
-      }
-      return response.json()
-    }).then(json => {
-      this.props.onStateChange('success', json)
-    }).catch(error => {
-      this.props.onStateChange('failure', error)
-    })
+    this.sendRequest()
   }
 
   render() {
     return null
+  }
+
+  private async sendRequest() {
+    try {
+      const { url, ...params } = this.props.params
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          ...params.headers,
+        },
+        credentials: 'same-origin',
+        ...params
+      })
+
+      if (!response.ok) {
+        throw response.status
+      }
+
+      const contentType = response.headers.get('content-type')
+      if (contentType &&
+          contentType.indexOf('application/json') !== -1) {
+        const json = await response.json()
+        this.props.onStateChange('success', json)
+      } else {
+        const text = await response.text()
+        this.props.onStateChange('success', text)
+      }
+      
+    } catch (err) {
+      this.props.onStateChange('failure', err)
+    }
   }
 }
 

@@ -1,3 +1,5 @@
+import { JSONObject } from '../types'
+
 export type TrackedRequestState = 'success' | 'failure' | 'pending'
 
 export interface TrackedRequestEffects {
@@ -10,11 +12,11 @@ export interface TrackedHttpRequest {
   state: TrackedRequestState
   effect: TrackedRequestEffects
   params: RequestInit & { url: RequestInfo }
-  data: JSONStringifyable
+  data: JSONObject
   error: any // XXX specify better
 }
 
-export interface HttpState {
+export interface StateSlice {
   outbox: TrackedHttpRequest[]
   lastRequestId: number
 }

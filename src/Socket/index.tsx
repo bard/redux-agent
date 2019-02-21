@@ -1,23 +1,18 @@
 import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
-import Fragment from '../util/Fragment'
+import { Fragment, withImmer } from '../util'
 import { SocketConnectionState,
          TrackedSocketMessage,
          SocketMessage,
-         SocketState } from '../Socket/types'
-import OutgoingSocketMessage from '../Socket/OutgoingSocketMessage'
+         SocketState } from './types'
+import OutgoingSocketMessage from './OutgoingSocketMessage'
 
 declare const Primus: any
-
-if (!('Primus' in window)) {
-// XXX actually check for existence of Primus in window and provide developer-friendly message if it doesn't
-  console.error('Primus object not available')
-}
-
-const debug = createDebug('reactor:Primus')
+const debug = createDebug('reactor:Socket')
 
 interface PropsFromUser {
+  connectionUrl: string
   onMessageReceived(data: SocketMessage): void
 }
 
@@ -32,13 +27,21 @@ interface PropsFromDispatch {
   messageSent(id: number): void
 }
 
-type Props = PropsFromUser & PropsFromState & PropsFromDispatch
+interface DefaultProps {
+  mode: 'websocket' | 'primus'
+}
+
+type Props = PropsFromUser & PropsFromState & PropsFromDispatch & DefaultProps
 
 class Socket extends React.Component<Props, {}> {
+  static defaultProps: DefaultProps = {
+    mode: 'websocket'
+  }
+  
   private socket: any = null
-
+  
   private hotReloading: boolean = false
-
+  
   constructor(props: Props) {
     super(props)
     debug('constructor')
@@ -67,7 +70,7 @@ class Socket extends React.Component<Props, {}> {
 
   render() {
     const { outbox = [] } = this.props
-
+    
     return (
       <Fragment>
         { outbox.map(message =>
@@ -84,7 +87,7 @@ class Socket extends React.Component<Props, {}> {
   private send(data: any) {
     this.socket.sendJSON(data)
   }
-
+  
   private messageWasSent(id: number) {
     this.props.messageSent(id)
   }
@@ -121,6 +124,7 @@ class Socket extends React.Component<Props, {}> {
     }
 
     debug('updateConnectionState')
+
     const currentState = this.socket && this.socket.readyState === this.socket.OPEN
                        ? 'connected'
                        : 'disconnected'
@@ -135,6 +139,44 @@ class Socket extends React.Component<Props, {}> {
   }
 
   private createSocket() {
+    switch(this.props.mode) {
+      case 'websocket':
+        this.createWebSocket()
+        break
+
+      case 'primus':
+        this.createPrimusSocket()
+        break
+    }
+  }
+
+  private createWebSocket() {
+    debug('createSocket')
+    this.socket = new WebSocket(this.props.connectionUrl)
+    this.socket.close
+    this.socket.sendJSON = function(data: any) {
+      return this.send(JSON.stringify(data))
+    }
+    this.socket.addEventListener('open', () => {
+      this.props.stateChanged('connected')
+    })
+    this.socket.addEventListener('close', () => {
+      this.props.stateChanged('disconnected')
+    })
+    this.socket.addEventListener('message', ({ data }: MessageEvent) => {
+      if (typeof data !== 'string') {
+        throw new Error('Non-string data not yet supported')
+      }
+      const message = JSON.parse(data)
+      this.props.onMessageReceived(message)
+    })
+  }
+
+  private createPrimusSocket() {
+    if (!('Primus' in window)) {
+      throw new Error('Primus not available.')
+    }
+    
     this.socket = Primus.connect({
       reconnect: {
         strategy: [ 'disconnect', 'online' ], // XXX why?
@@ -168,14 +210,16 @@ class Socket extends React.Component<Props, {}> {
     this.socket.on('data', (data: any) => {
       this.props.onMessageReceived(data)
     })
-  }
+  }  
 }
 
-export const createPrimusReactor = ({
-  actionPrefix = 'SOCKET_', stateKey = 'socket'
+const createSocketReactor = ({
+  stateKey = 'socket',
+  actionPrefix = 'SOCKET_'
 } = {}) => {
-
   const getStateSlice = (state: any): SocketState => (state[stateKey] || {})
+
+  /// actions
 
   const mapStateToProps = (state: any): PropsFromState => ({
     lastMessageId: getStateSlice(state).lastMessageId,
@@ -190,7 +234,7 @@ export const createPrimusReactor = ({
         payload: newConnectionState
       })
     },
-
+    
     messageSent(id: number) {
       dispatch({
         type: actionPrefix + 'MESSAGE_SENT',
@@ -199,8 +243,61 @@ export const createPrimusReactor = ({
     }
   })
 
-  return connect(
+  const Component = connect(
     mapStateToProps,
     mapDispatchToProps
   )(Socket)
+  
+  /// reducer
+  
+  const reducer = (state: any, action: any) => withImmer(state, (draft: any) => {
+    if (draft && !(stateKey in draft)) {
+      draft[stateKey] = {
+        currentState: 'disconnected',
+        desiredState: null,
+        lastMessageId: 0,
+        outbox: []
+      }
+    }
+
+    switch(action.type) {
+      case actionPrefix + 'MESSAGE_SENT':
+        const stateSlice = getStateSlice(draft)
+        stateSlice.outbox.splice(
+          stateSlice.outbox.findIndex(
+            (m: any) => m.id === action.payload),
+          1)
+        break
+
+      case actionPrefix + 'STATE_CHANGE':
+        getStateSlice(draft).currentState = action.payload
+        break
+    }
+  })
+
+  /// sub-reducers
+  
+  const addToOutbox = (state: any, data: any) => withImmer(state, (draft: any) => {
+    const stateSlice = getStateSlice(draft)
+    stateSlice.lastMessageId += 1
+    stateSlice.outbox.push({ id: stateSlice.lastMessageId, data })
+  })
+
+  const scheduleConnect = (state: any) => withImmer(state, (draft: any) => {
+    getStateSlice(draft).desiredState = 'connected'
+  })
+
+  const scheduleDisconnect = (state: any) => withImmer(state, (draft: any) => {
+    getStateSlice(draft).desiredState = 'disconnected'
+  })
+
+  return {
+    Component,
+    reducer,
+    addToOutbox,
+    scheduleConnect,
+    scheduleDisconnect
+  }
 }
+
+export default createSocketReactor

@@ -59,6 +59,11 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
   integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
+"@types/sleep@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@types/sleep/-/sleep-0.0.7.tgz#0572b5d06978b4305671c614b0f68b4640ce7d43"
+  integrity sha512-zYXnuRzGcHg+f6M1ECSmJsnLeq4tLAakGC1NwqiWk8QNjybMjXOy9+YH7zV7xrQRsrautl7R4JgmovEQKh9xVA==
+
 csstype@^2.2.0:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.2.tgz#3043d5e065454579afc7478a18de41909c8a2f01"
@@ -97,6 +102,11 @@ ms@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
+
+native-or-bluebird@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/native-or-bluebird/-/native-or-bluebird-1.2.0.tgz#39c47bfd7825d1fb9ffad32210ae25daadf101c9"
+  integrity sha1-OcR7/Xgl0fuf+tMiEK4l2q3xAck=
 
 path-parser@^4.2.0:
   version "4.2.0"
@@ -137,6 +147,25 @@ symbol-observable@^1.0.3, symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
   integrity sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==
+
+then-sleep@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/then-sleep/-/then-sleep-1.0.1.tgz#759823bdc4de56ba2a20812868eb872a803ed1f9"
+  integrity sha1-dZgjvcTeVroqIIEoaOuHKoA+0fk=
+  dependencies:
+    native-or-bluebird "^1.2.0"
+
+typesafe-actions@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/typesafe-actions/-/typesafe-actions-3.1.0.tgz#02210286145939b3b1ead2d71829a8b588592706"
+  integrity sha512-ChLrqMj6DVf8cVKxeIjp6EyA9AyJWJfg00MTuQjDf3MVW4si09P3BQW8JuWQA9Ag3vcRVHzUCPCvaXLa4RKsSQ==
+  optionalDependencies:
+    typescript "3.3.3"
+
+typescript@3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
+  integrity sha512-Y21Xqe54TBVp+VDSNbuDYdGw0BpoR/Q6wo/+35M8PAU0vipahnyduJWirxxdxjsAkS7hue53x2zp8gz7F05u0A==
 
 typescript@^3.3.1:
   version "3.3.1"
