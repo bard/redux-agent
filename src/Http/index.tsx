@@ -67,6 +67,11 @@ const createHttpReactor = ({
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
     requestFinished(request: TrackedHttpRequest, state, result) {
       dispatch({
+        type: actionPrefix + 'REQUEST_FINISHED',
+        payload: request.id
+      })
+
+      dispatch({
         type: (state === 'success'
              ? request.effect.success
              : request.effect.failure),
@@ -75,11 +80,6 @@ const createHttpReactor = ({
           requestParams: request.params
         },
         payload: result
-      })
-
-      dispatch({
-        type: actionPrefix + 'REQUEST_FINISHED',
-        payload: request.id
       })
     }
   })
