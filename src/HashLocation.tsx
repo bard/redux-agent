@@ -7,17 +7,18 @@ const debug = createDebug('reactor:HashLocation')
 
 interface Props {
   location: string
+  enabled: boolean
 }
 
 class HashLocation extends Component<Props, any> {
   constructor(props: Props) {
     super(props)
-    debug('constructor')
     this.locationDidChange = this.locationDidChange.bind(this)
   }
 
   componentDidMount() {
     debug('componentDidMount')
+
     window.addEventListener('hashchange', this.locationDidChange)
     if (!window.location.hash) {
       debug('no hash present, setting it')
@@ -37,6 +38,10 @@ class HashLocation extends Component<Props, any> {
     if (prevProps.location !== this.props.location) {
       this.updateLocation()
     }
+
+    if (prevProps.enabled !== this.props.enabled) {
+      debug('enabled changed')
+    }
   }
 
   render() {
@@ -48,7 +53,7 @@ class HashLocation extends Component<Props, any> {
     if (window.location.hash === newLocation) {
       debug(`location already at ${newLocation}, skipping update`)
     } else {
-      debug(`updating location to ${newLocation}`)
+      debug(`setting location to ${newLocation}`)
       this.withLocationListenerPaused(() => {
         window.location.hash = '#' + this.props.location
       })
@@ -56,12 +61,20 @@ class HashLocation extends Component<Props, any> {
   }
 
   private locationDidChange() {
-    const location = window.location.hash.substr(1) || '/'
-    debug('locationDidChange', location)
-    const match = this.findMatchingRoute(
-      location, React.Children.toArray(this.props.children))
-    if (match) {
-        match.onMatch(match.params)
+    debug('locationDidChange')
+    
+    if (this.props.enabled) {
+      const locationInput = window.location.hash.substr(1) || '/'
+      const matchingRoute = this.findMatchingRoute(
+        locationInput,
+        React.Children.toArray(this.props.children)
+      )
+      if (matchingRoute) {
+        matchingRoute.onMatch(matchingRoute.params)
+      }
+    } else {
+      debug('navigation disabled')
+      this.updateLocation()
     }
   }
 
