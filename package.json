@@ -11,6 +11,7 @@
     "then-sleep": "^1.0.1"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.81",
     "@types/debug": "^0.0.31",
     "@types/jquery": "^3.3.29",
     "@types/node": "^10.12.24",
