@@ -28,6 +28,12 @@ interface PropsFromDispatch {
 type Props = PropsFromUser & PropsFromState & PropsFromDispatch
 
 class Http extends React.Component<Props, {}> {
+  componentDidMount() {
+    if (!('fetch' in window)) {
+      throw new Error('window.fetch() is not available.')
+    }
+  }
+  
   render() {
     debug('render')
     if (!this.props.outbox) {
