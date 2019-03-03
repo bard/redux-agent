@@ -21,21 +21,20 @@ class HttpRequest extends Component<Props, any> {
   }
 
   private async sendRequest() {
-    try {
-      const { url, ...params } = this.props.params
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          ...params.headers,
-        },
-        credentials: 'same-origin',
-        ...params
-      })
+    debug('sendRequest')
 
-      if (!response.ok) {
-        throw response.status
-      }
+    const { url, ...params } = this.props.params
 
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        ...params.headers,
+      },
+      credentials: 'same-origin',
+      ...params
+    })
+
+    if (response.ok) {
       const contentType = response.headers.get('content-type')
       if (contentType &&
           contentType.indexOf('application/json') !== -1) {
@@ -45,9 +44,8 @@ class HttpRequest extends Component<Props, any> {
         const text = await response.text()
         this.props.onStateChange('success', text)
       }
-      
-    } catch (err) {
-      this.props.onStateChange('failure', err)
+    } else {
+      this.props.onStateChange('failure', response.status)
     }
   }
 }
