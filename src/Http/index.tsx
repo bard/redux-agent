@@ -1,3 +1,4 @@
+import findIndex from 'core-js/library/fn/array/find-index'
 import createDebug from 'debug'
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import { Dispatch } from 'redux'
@@ -109,8 +110,8 @@ const createHttpReactor = ({
       case getType(actions.requestFinished):
         const stateSlice = getStateSlice(draft)
         stateSlice.outbox.splice(
-          stateSlice.outbox.findIndex(
-            (r: TrackedHttpRequest) => r.id === action.payload),
+          findIndex(stateSlice.outbox,
+                    (r: TrackedHttpRequest) => r.id === action.payload),
           1)
         break
     }

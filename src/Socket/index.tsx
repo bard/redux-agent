@@ -1,3 +1,4 @@
+import findIndex from 'core-js/library/fn/array/find-index'
 import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
@@ -264,8 +265,8 @@ const createSocketReactor = ({
       case actionPrefix + 'MESSAGE_SENT':
         const stateSlice = getStateSlice(draft)
         stateSlice.outbox.splice(
-          stateSlice.outbox.findIndex(
-            (m: any) => m.id === action.payload),
+          findIndex(stateSlice.outbox,
+                    (m: any) => m.id === action.payload),
           1)
         break
 

@@ -4,9 +4,7 @@
     "target": "es3",
     "module": "commonjs",
     "removeComments": true,
-    "checkJs": false,
-    "allowJs": true,
-    "lib": ["es2017", "es5", "dom"],
+    "lib": ["es5", "dom", "es2015.promise"],
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "sourceMap": true
