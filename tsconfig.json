@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./lib",
-    "target": "es3",
+    "target": "es5",
     "module": "commonjs",
-    "removeComments": true,
     "lib": ["es5", "dom", "es2015.promise"],
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "dist",
+    "declaration": true,
+    "declarationDir": "dist"
   },
   "include": [
-    "./src/**/*.tsx",
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
+    "src"
   ]
 }

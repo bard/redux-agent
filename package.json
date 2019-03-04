@@ -2,8 +2,12 @@
   "private": true,
   "name": "redux-reactor",
   "version": "0.1.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "debug": "3",
     "path-parser": "^4.2.0",
@@ -21,11 +25,17 @@
     "core-js": "^2.6.5",
     "immer": "^2.1.0",
     "reconnecting-websocket": "^4.1.10",
+    "rimraf": "^2.6.3",
+    "tslint": "^5.13.1",
     "typesafe-actions": "^3.1.0",
     "typescript": "^3.3.1"
   },
   "scripts": {
-    "build": "rm -rf ./lib && tsc"
+    "prebuild": "rimraf lib",
+    "build": "tsc",
+    "prepare": "tsc",
+    "lint": "tslint  --project tsconfig.json -t codeFrame",
+    "dev": "tsc --watch"
   },
   "peerDependencies": {
     "immer": "^2.1.0",
@@ -33,5 +43,8 @@
     "react-dom": "^16.8.1",
     "react-redux": "^6.0.0",
     "redux": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }

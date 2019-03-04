@@ -1,0 +1,23 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "quotemark": [true, "single", "jsx-single"],
+    "semicolon": [true, "never"],
+    "ordered-imports": false,
+    "object-literal-sort-keys": false,
+    "interface-name": [true, "never-prefix"],
+    "member-access": [true, "no-public"],
+    "trailing-comma": false,
+    "no-string-literal": false,
+    "no-trailing-whitespace": false,
+    "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
+    "whitespace": [
+      true,
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type",
+      "check-typecast"
+    ]
+  }
+}
