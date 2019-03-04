@@ -18,3 +18,8 @@ declare interface WebSocket {
   sendJSON(data: any): void
 }
 
+// https://github.com/mweststrate/immer/issues/321
+declare interface Map<K, V> {}
+declare interface WeakMap<K, V> {}
+declare interface WeakSet<K> {}
+declare interface Set<K> {}

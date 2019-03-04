@@ -2,6 +2,7 @@ import findIndex from 'core-js/library/fn/array/find-index'
 import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
+import ReconnectingWebSocket from 'reconnecting-websocket'
 import { Fragment, withImmer } from '../util'
 import { SocketConnectionState,
          TrackedSocketMessage,
@@ -153,7 +154,7 @@ class Socket extends React.Component<Props, {}> {
 
   private createWebSocket() {
     debug('createSocket')
-    this.socket = new WebSocket(this.props.connectionUrl)
+    this.socket = new ReconnectingWebSocket(this.props.connectionUrl)
     this.socket.close
     this.socket.sendJSON = function(data: any) {
       return this.send(JSON.stringify(data))
