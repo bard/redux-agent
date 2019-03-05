@@ -1,9 +1,11 @@
+import invariant from 'invariant'
 import produce, { isDraft } from 'immer'
 import createDebug from 'debug'
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import { sendChromeMessage } from './util'
 
 const debug = createDebug('reactor:WebExtInstall')
 
@@ -13,34 +15,29 @@ interface PropsFromUser {
 
 interface PropsFromState {
   installDesired: boolean
+  status: InstallStatus
 }
 
 interface PropsFromDispatch {
-  present(): void
-  installAvailable(): void
-  installUnavailable(): void
+  installed(): void
+  installable(): void
+  notInstallable(): void
 }
 
 type Props = PropsFromUser & PropsFromState & PropsFromDispatch
 
 class WebExtInstall extends React.Component<Props, {}> {
+  statusPollInterval: number
+
   constructor(props: Props) {
     super(props)
     debug('constructor')
-
     // XXX validate chromeInstallUrl
-    this.messageWasReceived = this.messageWasReceived.bind(this)
   }
 
   componentDidMount() {
     debug('componentDidMount')
-    window.addEventListener('message', this.messageWasReceived, false)
     this.checkForWebExt()
-  }
-
-  componentWillUnmount() {
-    debug('componentWillUnmount')
-    window.removeEventListener('message', this.messageWasReceived, false)
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -48,6 +45,7 @@ class WebExtInstall extends React.Component<Props, {}> {
     if (this.props.installDesired !== prevProps.installDesired &&
       this.props.installDesired === true) {
       window.open(this.getInstallUrl())
+      this.pollForInstallStatus()
     }
   }
 
@@ -55,61 +53,56 @@ class WebExtInstall extends React.Component<Props, {}> {
     return null
   }
 
+  private async checkForWebExt() {
+    invariant(this.props.status === 'unknown', 'bug')
+    
+    if ('chrome' in window &&
+        typeof chrome.runtime !== 'undefined') {
+      if (await this.isWebExtInstalled(this.getExtId())) {
+        this.props.installed()
+      } else {
+        this.props.installable()
+      }
+    } else {
+      this.props.notInstallable()
+    }
+  }
+  
+  private pollForInstallStatus() {
+    invariant(
+      this.props.status === 'installing' && this.statusPollInterval !== null,
+      'bug')
+    
+    this.statusPollInterval = window.setInterval(async () => {
+      if (await this.isWebExtInstalled(this.getExtId())) {
+        window.clearInterval(this.statusPollInterval)
+        this.props.installed()
+      }
+    }, 1000)      
+  }
+
   private getExtId() {
     return this.props.chromeInstallUrl.split('/').slice(-1).pop() as string
   }
 
-  private getExtOrigin() {
-    // XXX ???
-    return this.getExtId()
-  }
-
-  private messageWasReceived(event: MessageEvent) {
-    if (event.origin !== this.getExtOrigin()) {
-      return
-    }
-
-    // https://developer.chrome.com/extensions/content_scripts#host-page-communication
-    // XXX TBD
-    if (event.data === 'ext-installed') {
-      this.props.present()
-    }
-  }
-
-  private async checkForWebExt() {
-    if ('chrome' in window && typeof chrome.runtime !== 'undefined') {
-      try {
-        const extId = this.getExtId()
-        await this.sendChromeMessage(extId, { type: 'version' })
-        this.props.present()
-      } catch (err) {
-        this.props.installAvailable()
-      }
-    } else {
-      this.props.installUnavailable()
+  private async isWebExtInstalled(extId: string) {
+    try {
+      await sendChromeMessage(extId, { type: 'version' })
+      return true
+    } catch (err) {
+      return false
     }
   }
 
   private getInstallUrl() {
     return this.props.chromeInstallUrl
   }
-
-  private sendChromeMessage(targetId: string, message: any) {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(targetId, message, (response) => {
-        if (response) {
-          resolve(response)
-        } else {
-          reject(chrome.runtime.lastError)
-        }
-      })
-    })
-  }
 }
 
+type InstallStatus = 'unknown' | 'unavailable' | 'available' | 'installing' | 'installed'
+
 interface StateSlice {
-  installed: null | boolean
-  installable: null | boolean
+  status: InstallStatus
   installDesired: boolean
 }
 
@@ -121,21 +114,23 @@ const createWebExtInstallReactor = ({
   /// actions
 
   const actions = {
-    present: createAction(`${actionPrefix}INSTALLED`),
-    installAvailable: createAction(`${actionPrefix}INSTALL_AVAILABLE`),
-    installUnavailable: createAction(`${actionPrefix}INSTALL_UNAVAILABLE`),
+    installed: createAction(`${actionPrefix}STATUS_INSTALLED`),
+    available: createAction(`${actionPrefix}STATUS_AVAILABLE`),
+    unavailable: createAction(`${actionPrefix}STATUS_UNAVAILABLE`),
+    installing: createAction(`${actionPrefix}STATUS_INSTALLING`)
   }
 
   /// connected component
 
   const mapStateToProps = (state: any): PropsFromState => ({
-    installDesired: getStateSlice(state).installDesired
+    installDesired: getStateSlice(state).installDesired,
+    status: getStateSlice(state).status
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
-    present() { dispatch(actions.present()) },
-    installAvailable() { dispatch(actions.installAvailable()) },
-    installUnavailable() { dispatch(actions.installUnavailable()) },
+    installed() { dispatch(actions.installed()) },
+    installable() { dispatch(actions.available()) },
+    notInstallable() { dispatch(actions.unavailable()) },
   })
 
   const Component = connect(
@@ -151,8 +146,7 @@ const createWebExtInstallReactor = ({
   ): S => produce(state, (draft: S) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
-        installed: null,
-        installable: null,
+        status: 'unknown',
         installDesired: false
       } as StateSlice
     }
@@ -160,14 +154,17 @@ const createWebExtInstallReactor = ({
     const stateSlice = getStateSlice(draft)
 
     switch (action.type) {
-      case getType(actions.present):
-        stateSlice.installed = true
+      case getType(actions.installed):
+        stateSlice.status = 'installed'
         break
-      case getType(actions.installAvailable):
-        stateSlice.installable = true
+      case getType(actions.available):
+        stateSlice.status = 'available'
         break
-      case getType(actions.installUnavailable):
-        stateSlice.installable = false
+      case getType(actions.unavailable):
+        stateSlice.status = 'unavailable'
+        break
+      case getType(actions.unavailable):
+        stateSlice.status = 'installing'
         break
     }
   })
@@ -183,16 +180,20 @@ const createWebExtInstallReactor = ({
 
   /// selectors
 
+  const getStatus = (state: any) =>
+    getStateSlice(state).status
+
   const getInstallable = (state: any) =>
-    getStateSlice(state).installable
+    getStateSlice(state).status === 'available'
 
   const getInstalled = (state: any) =>
-    getStateSlice(state).installed
+    getStateSlice(state).status === 'installed'
 
   return {
     Component,
     reducer,
     scheduleInstall,
+    getStatus,
     getInstallable,
     getInstalled
   }

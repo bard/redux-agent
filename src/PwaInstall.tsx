@@ -138,9 +138,9 @@ const createPwaInstallReactor = ({
   /// actions
 
   const actions = {
-    present: createAction(`${actionPrefix}PRESENT`),
-    installAvailable: createAction(`${actionPrefix}INSTALL_AVAILABLE`),
-    installUnavailable: createAction(`${actionPrefix}INSTALL_UNAVAILABLE`),
+    installed: createAction(`${actionPrefix}INSTALLED`),
+    installable: createAction(`${actionPrefix}INSTALLABLE`),
+    notInstallable: createAction(`${actionPrefix}NOT_INSTALLABLE`),
     installSuccess: createAction(`${actionPrefix}INSTALL_SUCCESS`),
     installCancel: createAction(`${actionPrefix}INSTALL_CANCEL`),
     installProgress: createAction(`${actionPrefix}INSTALL_PROGRESS`),
@@ -153,9 +153,9 @@ const createPwaInstallReactor = ({
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
-    present() { dispatch(actions.present()) },
-    installAvailable() { dispatch(actions.installAvailable()) },
-    installUnavailable() { dispatch(actions.installUnavailable()) },
+    present() { dispatch(actions.installed()) },
+    installAvailable() { dispatch(actions.installable()) },
+    installUnavailable() { dispatch(actions.notInstallable()) },
     installSuccess() { dispatch(actions.installSuccess()) },
     installCancel() { dispatch(actions.installCancel()) },
     installProgress() { dispatch(actions.installProgress()) },
@@ -168,10 +168,10 @@ const createPwaInstallReactor = ({
 
   /// reducer
 
-  const reducer = <S extends {}>(
-    state: S,
+  const reducer = (
+    state: any,
     action: ActionType<typeof actions>
-  ): S => produce(state, (draft: S) => {
+  ) => produce(state, (draft: any) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
         installed: null,
@@ -183,15 +183,15 @@ const createPwaInstallReactor = ({
     const stateSlice = getStateSlice(draft)
 
     switch (action.type) {
-      case getType(actions.present):
+      case getType(actions.installed):
         stateSlice.installed = true
         break
 
-      case getType(actions.installAvailable):
+      case getType(actions.installable):
         stateSlice.installable = true
         break
 
-      case getType(actions.installUnavailable):
+      case getType(actions.notInstallable):
         stateSlice.installable = false
         break
     }
@@ -203,7 +203,7 @@ const createPwaInstallReactor = ({
     ? worker(state, worker)
     : produce(state, worker)
 
-  const scheduleInstall = <S extends any>(state: S): S =>
+  const scheduleInstall = <S extends {}>(state: S): S =>
     withImmer(state, (draft: S) => {
       getStateSlice(draft).installDesired = true
     })
