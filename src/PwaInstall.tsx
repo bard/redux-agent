@@ -1,5 +1,4 @@
 import produce, { isDraft } from 'immer'
-import includes from 'core-js/library/fn/array/includes'
 import createDebug from 'debug'
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import React from 'react'
@@ -95,7 +94,7 @@ class PwaInstall extends React.Component<Props, {}> {
   private async checkForPwa() {
     if ('getInstalledRelatedApps' in navigator) {
       const relatedApps = await navigator.getInstalledRelatedApps()
-      if (includes(relatedApps, 'XXX')) {
+      if (relatedApps.includes('XXX')) {
         this.props.present()
       }
     }
