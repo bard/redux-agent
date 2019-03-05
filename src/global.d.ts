@@ -1,9 +1,17 @@
 declare type JSONType = import('./types').JSONObject
 
-declare module module {
-  export const hot: any
-}
 
+// Temporary. Should be removed after @types/node is no longer
+// imported into global scope by transitive dependencies, and replaced
+// with:
+//
+// declare module module {
+//   export const hot: any
+// }
+
+interface NodeModule {
+  hot: any
+}
 
 declare interface WebSocket {
   sendJSON(data: any): void
@@ -12,11 +20,15 @@ declare interface WebSocket {
 
 // Workaround for using immer in projects targeting ES5.
 // https://github.com/mweststrate/immer/issues/321
-
-declare interface Map<K, V> {}
-declare interface WeakMap<K, V> {}
-declare interface WeakSet<K> {}
-declare interface Set<K> {}
+//
+// Temporarily commented out, because @types/node is being imported by
+// transitive dependencies. Must be uncommented again when that is no
+// longer the case.
+//
+// declare interface Map<K, V> {}
+// declare interface WeakMap<K, V> {}
+// declare interface WeakSet<K> {}
+// declare interface Set<K> {}
 
 // Polyfills
 
