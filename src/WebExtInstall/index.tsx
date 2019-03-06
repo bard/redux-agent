@@ -18,20 +18,21 @@ interface PropsFromUser {
 
 interface PropsFromState {
   installDesired: boolean
-  status: InstallState
+  installState: InstallState
 }
 
 interface PropsFromDispatch {
   installed(): void
   installable(): void
   notInstallable(): void
+  installing(): void
 }
 
 type Props = PropsFromUser & PropsFromState & PropsFromDispatch
 
 class WebExtInstall extends React.Component<Props, {}> {
   private installStatusPollInterval: number | null = null
-  
+
   componentDidMount() {
     debug('componentDidMount')
     this.checkForWebExt()
@@ -40,8 +41,11 @@ class WebExtInstall extends React.Component<Props, {}> {
   componentDidUpdate(prevProps: Props) {
     debug('componentDidUpdate', this.props.installDesired)
     if (this.props.installDesired !== prevProps.installDesired &&
-      this.props.installDesired === true) {
+        this.props.installDesired === true) {
+      this.props.installing()
       window.open(this.getInstallUrl())
+    } else if (this.props.installState !== prevProps.installState &&
+               this.props.installState === 'installing') {
       this.pollForInstallStatus()
     }
   }
@@ -51,8 +55,8 @@ class WebExtInstall extends React.Component<Props, {}> {
   }
 
   private async checkForWebExt() {
-    invariant(this.props.status === 'unknown', 'bug')
-    
+    invariant(this.props.installState === 'unknown', 'bug')
+
     if ('chrome' in window &&
         typeof chrome.runtime !== 'undefined') {
       if (await this.isWebExtInstalled(this.getExtId())) {
@@ -64,22 +68,24 @@ class WebExtInstall extends React.Component<Props, {}> {
       this.props.notInstallable()
     }
   }
-  
+
   private pollForInstallStatus() {
-    if (this.props.status !== 'installing') {
-      throw new Error('Can only poll for install status once installation begins.')
+    if (this.props.installState !== 'installing') {
+      throw new Error(`Can only poll for install status once installation begins. Current state: ${this.props.installState}`)
     }
 
     if (this.installStatusPollInterval !== null) {
       throw new Error('Already polling for install status.')
     }
-    
+
     this.installStatusPollInterval = window.setInterval(async () => {
+      debug('polling for install status')
       if (await this.isWebExtInstalled(this.getExtId())) {
+        debug('install verified')
         window.clearInterval(this.installStatusPollInterval!)
         this.props.installed()
       }
-    }, 1000)      
+    }, 1000)
   }
 
   private async isWebExtInstalled(extId: string) {
@@ -145,23 +151,24 @@ const createWebExtInstallReactor = ({
   /// actions
 
   const actions = {
-    installed: createAction(`${actionPrefix}STATUS_INSTALLED`),
-    installable: createAction(`${actionPrefix}STATUS_INSTALLABLE`),
-    notInstallable: createAction(`${actionPrefix}STATUS_NOT_INSTALLABLE`),
-    installing: createAction(`${actionPrefix}STATUS_INSTALLING`)
+    installed: createAction(`${actionPrefix}INSTALLED`),
+    installable: createAction(`${actionPrefix}INSTALLABLE`),
+    notInstallable: createAction(`${actionPrefix}NOT_INSTALLABLE`),
+    installing: createAction(`${actionPrefix}INSTALLING`)
   }
 
   /// connected component
 
   const mapStateToProps = (state: any): PropsFromState => ({
     installDesired: getStateSlice(state).installDesired,
-    status: getStateSlice(state).installState
+    installState: getStateSlice(state).installState
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
     installed() { dispatch(actions.installed()) },
     installable() { dispatch(actions.installable()) },
     notInstallable() { dispatch(actions.notInstallable()) },
+    installing() { dispatch(actions.installing()) }
   })
 
   const Component = connect(
@@ -223,7 +230,8 @@ const createWebExtInstallReactor = ({
     getStateSlice(state).installState
 
   const getInstallable = (state: any) =>
-    getStateSlice(state).installState === 'installable'
+    ['installable', 'installing'].includes(
+      getStateSlice(state).installState)
 
   const getInstalled = (state: any) =>
     getStateSlice(state).installState === 'installed'
@@ -234,7 +242,8 @@ const createWebExtInstallReactor = ({
     addToTasks,
     getStatus,
     getInstallable,
-    getInstalled
+    getInstalled,
+    actions
   }
 }
 

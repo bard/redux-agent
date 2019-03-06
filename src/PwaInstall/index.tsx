@@ -235,7 +235,7 @@ const createPwaInstallReactor = ({
   /// selectors
 
   const getInstallable = (state: any) =>
-    getStateSlice(state).installState === 'installable'
+    ['installable', 'installing'].includes(getStateSlice(state).installState)
 
   const getInstalled = (state: any) =>
     getStateSlice(state).installState === 'installed'
