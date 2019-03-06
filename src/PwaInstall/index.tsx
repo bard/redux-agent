@@ -31,7 +31,7 @@ type Props = PropsFromState & PropsFromDispatch
 
 class PwaInstall extends React.Component<Props, {}> {
   beforeInstallPromptEvent: BeforeInstallPromptEvent | null = null
-  giveupWaitingForInstallPromptTimeoutId: number
+  giveupWaitingForInstallPromptTimeoutId: number | null = null
 
   constructor(props: Props) {
     super(props)
@@ -44,7 +44,8 @@ class PwaInstall extends React.Component<Props, {}> {
   componentDidMount() {
     debug('componentDidMount')
     window.addEventListener(
-      'beforeinstallprompt', this.installPromptEventDidFire, false)
+      'beforeinstallprompt', this.installPromptEventDidFire as EventListener,
+      false)
     window.addEventListener(
       'appinstalled', this.appInstallEventDidFire, false)
     this.giveupWaitingForInstallPromptTimeoutId = window.setTimeout(
@@ -55,7 +56,8 @@ class PwaInstall extends React.Component<Props, {}> {
   componentWillUnmount() {
     debug('componentWillUnmount')
     window.removeEventListener(
-      'beforeinstallprompt', this.installPromptEventDidFire, false)
+      'beforeinstallprompt', this.installPromptEventDidFire as EventListener,
+      false)
     window.removeEventListener(
       'appinstalled', this.appInstallEventDidFire, false)
   }
@@ -101,6 +103,10 @@ class PwaInstall extends React.Component<Props, {}> {
   }
 
   private installPromptEventDidFire(event: BeforeInstallPromptEvent) {
+    if (this.giveupWaitingForInstallPromptTimeoutId === null) {
+      throw new Error('Bug: install timeout was not set.')
+    }
+    
     window.clearTimeout(this.giveupWaitingForInstallPromptTimeoutId)
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     event.preventDefault()

@@ -30,7 +30,7 @@ interface PropsFromDispatch {
 type Props = PropsFromUser & PropsFromState & PropsFromDispatch
 
 class WebExtInstall extends React.Component<Props, {}> {
-  private installStatusPollInterval: number
+  private installStatusPollInterval: number | null = null
   
   componentDidMount() {
     debug('componentDidMount')
@@ -76,7 +76,7 @@ class WebExtInstall extends React.Component<Props, {}> {
     
     this.installStatusPollInterval = window.setInterval(async () => {
       if (await this.isWebExtInstalled(this.getExtId())) {
-        window.clearInterval(this.installStatusPollInterval)
+        window.clearInterval(this.installStatusPollInterval!)
         this.props.installed()
       }
     }, 1000)      
@@ -171,7 +171,7 @@ const createWebExtInstallReactor = ({
 
   /// reducer
 
-  const reducer = <S extends {}>(
+  const reducer = <S extends any>(
     state: S,
     action: ActionType<typeof actions>
   ): S => produce(state, (draft: S) => {

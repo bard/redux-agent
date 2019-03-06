@@ -95,21 +95,22 @@ class Socket extends React.Component<Props, {}> {
 
   private setupHMR() {
     if (module.hot) {
+      const globalScope = window as any
       debug('adding handlers to persist socket state across hot reloads')
       if (module.hot.accept.length === 1) {
         // It's Parcel
         const hmrSaveId = '__HMR_SAVE_SOCKET'
         module.hot.dispose(() => {
           debug('saving socket before hot reload')
-          window[hmrSaveId] = this.socket
+          globalScope[hmrSaveId] = this.socket
           this.hotReloading = true
         })
 
-        if (window[hmrSaveId]) {
+        if (globalScope[hmrSaveId]) {
           debug('restoring socket after hot reload')
           this.hotReloading = true
-          this.socket = window[hmrSaveId]
-          delete window[hmrSaveId]
+          this.socket = globalScope[hmrSaveId]
+          delete globalScope[hmrSaveId]
         }
       } else if (module.hot.accept.length === 2) {
         // It's WebPack
