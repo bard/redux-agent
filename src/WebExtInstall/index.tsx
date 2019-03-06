@@ -10,7 +10,10 @@ import { sendChromeMessage } from './util'
 const debug = createDebug('reactor:WebExtInstall')
 
 interface PropsFromUser {
-  chromeInstallUrl: string
+  chromeInstallUrl?: string
+  chromeExtId?: string
+  firefoxInstallUrl?: string
+  firefoxExtId?: string
 }
 
 interface PropsFromState {
@@ -27,14 +30,8 @@ interface PropsFromDispatch {
 type Props = PropsFromUser & PropsFromState & PropsFromDispatch
 
 class WebExtInstall extends React.Component<Props, {}> {
-  statusPollInterval: number
-
-  constructor(props: Props) {
-    super(props)
-    debug('constructor')
-    // XXX validate chromeInstallUrl
-  }
-
+  private installStatusPollInterval: number
+  
   componentDidMount() {
     debug('componentDidMount')
     this.checkForWebExt()
@@ -69,20 +66,20 @@ class WebExtInstall extends React.Component<Props, {}> {
   }
   
   private pollForInstallStatus() {
-    invariant(
-      this.props.status === 'installing' && this.statusPollInterval !== null,
-      'bug')
+    if (this.props.status !== 'installing') {
+      throw new Error('Can only poll for install status once installation begins.')
+    }
+
+    if (this.installStatusPollInterval !== null) {
+      throw new Error('Already polling for install status.')
+    }
     
-    this.statusPollInterval = window.setInterval(async () => {
+    this.installStatusPollInterval = window.setInterval(async () => {
       if (await this.isWebExtInstalled(this.getExtId())) {
-        window.clearInterval(this.statusPollInterval)
+        window.clearInterval(this.installStatusPollInterval)
         this.props.installed()
       }
     }, 1000)      
-  }
-
-  private getExtId() {
-    return this.props.chromeInstallUrl.split('/').slice(-1).pop() as string
   }
 
   private async isWebExtInstalled(extId: string) {
@@ -94,8 +91,36 @@ class WebExtInstall extends React.Component<Props, {}> {
     }
   }
 
-  private getInstallUrl() {
-    return this.props.chromeInstallUrl
+  private getExtId(): string {
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      if (typeof this.props.firefoxExtId === 'undefined') {
+        throw new Error('Extension ID not defined for this browser.')
+      }
+      return this.props.firefoxExtId
+    } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
+      if (typeof this.props.chromeExtId === 'undefined') {
+        throw new Error('Extension ID not defined for this browser.')
+      }
+      return this.props.chromeExtId
+    } else {
+      throw new Error('Extension installation not supported in this browser.')
+    }
+  }
+
+  private getInstallUrl(): string {
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      if (typeof this.props.firefoxInstallUrl === 'undefined') {
+        throw new Error('Extension install URL not defined for this browser.')
+      }
+      return this.props.firefoxInstallUrl
+    } else if (navigator.userAgent.indexOf('Chrome') !== -1) {
+      if (typeof this.props.chromeInstallUrl === 'undefined') {
+        throw new Error('Extension install URL not defined for this browser.')
+      }
+      return this.props.chromeInstallUrl
+    } else {
+      throw new Error('Extension installation not supported in this browser.')
+    }
   }
 }
 
