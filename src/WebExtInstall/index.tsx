@@ -15,7 +15,7 @@ interface PropsFromUser {
 
 interface PropsFromState {
   installDesired: boolean
-  status: InstallStatus
+  status: InstallState
 }
 
 interface PropsFromDispatch {
@@ -99,12 +99,18 @@ class WebExtInstall extends React.Component<Props, {}> {
   }
 }
 
-type InstallStatus = 'unknown' | 'unavailable' | 'available' | 'installing' | 'installed'
-
 interface StateSlice {
-  status: InstallStatus
+  installState: InstallState
   installDesired: boolean
 }
+
+type InstallState = 'unknown'
+                  | 'not-installable'
+                  | 'installable'
+                  | 'installing'
+                  | 'installed'
+
+type Task = 'install'
 
 const createWebExtInstallReactor = ({
   actionPrefix = 'WEB_EXT_', stateKey = 'webExt'
@@ -115,8 +121,8 @@ const createWebExtInstallReactor = ({
 
   const actions = {
     installed: createAction(`${actionPrefix}STATUS_INSTALLED`),
-    available: createAction(`${actionPrefix}STATUS_AVAILABLE`),
-    unavailable: createAction(`${actionPrefix}STATUS_UNAVAILABLE`),
+    installable: createAction(`${actionPrefix}STATUS_INSTALLABLE`),
+    notInstallable: createAction(`${actionPrefix}STATUS_NOT_INSTALLABLE`),
     installing: createAction(`${actionPrefix}STATUS_INSTALLING`)
   }
 
@@ -124,13 +130,13 @@ const createWebExtInstallReactor = ({
 
   const mapStateToProps = (state: any): PropsFromState => ({
     installDesired: getStateSlice(state).installDesired,
-    status: getStateSlice(state).status
+    status: getStateSlice(state).installState
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
     installed() { dispatch(actions.installed()) },
-    installable() { dispatch(actions.available()) },
-    notInstallable() { dispatch(actions.unavailable()) },
+    installable() { dispatch(actions.installable()) },
+    notInstallable() { dispatch(actions.notInstallable()) },
   })
 
   const Component = connect(
@@ -146,7 +152,7 @@ const createWebExtInstallReactor = ({
   ): S => produce(state, (draft: S) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
-        status: 'unknown',
+        installState: 'unknown',
         installDesired: false
       } as StateSlice
     }
@@ -155,16 +161,16 @@ const createWebExtInstallReactor = ({
 
     switch (action.type) {
       case getType(actions.installed):
-        stateSlice.status = 'installed'
+        stateSlice.installState = 'installed'
         break
-      case getType(actions.available):
-        stateSlice.status = 'available'
+      case getType(actions.installable):
+        stateSlice.installState = 'installable'
         break
-      case getType(actions.unavailable):
-        stateSlice.status = 'unavailable'
+      case getType(actions.notInstallable):
+        stateSlice.installState = 'not-installable'
         break
-      case getType(actions.unavailable):
-        stateSlice.status = 'installing'
+      case getType(actions.installing):
+        stateSlice.installState = 'installing'
         break
     }
   })
@@ -173,26 +179,34 @@ const createWebExtInstallReactor = ({
     ? worker(state, worker)
     : produce(state, worker)
 
-  const scheduleInstall = <S extends any>(state: S): S =>
-    withImmer(state, (draft: S) => {
-      getStateSlice(draft).installDesired = true
-    })
+  const addToTasks = <S extends any>(
+    state: S,
+    task: Task
+  ): S => withImmer(state, (draft: S) => {
+    switch(task) {
+      case 'install':
+        getStateSlice(draft).installDesired = true
+        break
+      default:
+        throw new Error(`Invalid task ${task}`)
+    }
+  })
 
   /// selectors
 
   const getStatus = (state: any) =>
-    getStateSlice(state).status
+    getStateSlice(state).installState
 
   const getInstallable = (state: any) =>
-    getStateSlice(state).status === 'available'
+    getStateSlice(state).installState === 'installable'
 
   const getInstalled = (state: any) =>
-    getStateSlice(state).status === 'installed'
+    getStateSlice(state).installState === 'installed'
 
   return {
     Component,
     reducer,
-    scheduleInstall,
+    addToTasks,
     getStatus,
     getInstallable,
     getInstalled

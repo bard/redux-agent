@@ -19,9 +19,9 @@ interface PropsFromState {
 }
 
 interface PropsFromDispatch {
-  present(): void
-  installAvailable(): void
-  installUnavailable(): void
+  installed(): void
+  installable(): void
+  notInstallable(): void
   installCancel(): void
   installSuccess(): void
   installProgress(): void
@@ -95,7 +95,7 @@ class PwaInstall extends React.Component<Props, {}> {
     if ('getInstalledRelatedApps' in navigator) {
       const relatedApps = await navigator.getInstalledRelatedApps()
       if (relatedApps.includes('XXX')) {
-        this.props.present()
+        this.props.installed()
       }
     }
   }
@@ -110,12 +110,12 @@ class PwaInstall extends React.Component<Props, {}> {
     // Stash the event so it can be triggered later.
     this.beforeInstallPromptEvent = event
 
-    this.props.installAvailable()
+    this.props.installable()
   }
 
   private installPromptEventDidNotFire() {
     debug('event beforeinstallprompt did not fire within timeout')
-    this.props.installUnavailable()
+    this.props.notInstallable()
   }
 
   private appInstallEventDidFire(event: Event) {
@@ -125,10 +125,17 @@ class PwaInstall extends React.Component<Props, {}> {
 }
 
 interface StateSlice {
-  installed: null | boolean
-  installable: null | boolean
+  installState: InstallState
   installDesired: boolean
 }
+
+type InstallState = 'unknown'
+                  | 'not-installable'
+                  | 'installable'
+                  | 'installing'
+                  | 'installed'
+
+type Task = 'install'
 
 const createPwaInstallReactor = ({
   actionPrefix = 'PWA_', stateKey = 'pwa'
@@ -153,9 +160,9 @@ const createPwaInstallReactor = ({
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
-    present() { dispatch(actions.installed()) },
-    installAvailable() { dispatch(actions.installable()) },
-    installUnavailable() { dispatch(actions.notInstallable()) },
+    installed() { dispatch(actions.installed()) },
+    installable() { dispatch(actions.installable()) },
+    notInstallable() { dispatch(actions.notInstallable()) },
     installSuccess() { dispatch(actions.installSuccess()) },
     installCancel() { dispatch(actions.installCancel()) },
     installProgress() { dispatch(actions.installProgress()) },
@@ -174,8 +181,7 @@ const createPwaInstallReactor = ({
   ) => produce(state, (draft: any) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
-        installed: null,
-        installable: null,
+        installState: 'unknown',
         installDesired: false
       } as StateSlice
     }
@@ -184,15 +190,20 @@ const createPwaInstallReactor = ({
 
     switch (action.type) {
       case getType(actions.installed):
-        stateSlice.installed = true
+      case getType(actions.installSuccess):
+        stateSlice.installState = 'installed'
         break
 
       case getType(actions.installable):
-        stateSlice.installable = true
+        stateSlice.installState = 'installable'
         break
 
       case getType(actions.notInstallable):
-        stateSlice.installable = false
+        stateSlice.installState = 'not-installable'
+        break
+
+      case getType(actions.installProgress):
+        stateSlice.installState = 'installing'
         break
     }
   })
@@ -203,23 +214,30 @@ const createPwaInstallReactor = ({
     ? worker(state, worker)
     : produce(state, worker)
 
-  const scheduleInstall = <S extends {}>(state: S): S =>
-    withImmer(state, (draft: S) => {
-      getStateSlice(draft).installDesired = true
-    })
+  const addToTasks = <S extends {}>(
+    state: S, task: Task
+  ): S => withImmer(state, (draft: S) => {
+    switch(task) {
+      case 'install':
+        getStateSlice(draft).installDesired = true
+        break
+      default:
+        throw new Error(`Invalid task: ${task}`)
+    }
+  })
 
   /// selectors
 
   const getInstallable = (state: any) =>
-    getStateSlice(state).installable
+    getStateSlice(state).installState === 'installable'
 
   const getInstalled = (state: any) =>
-    getStateSlice(state).installed
+    getStateSlice(state).installState === 'installed'
 
   return {
     Component,
     reducer,
-    scheduleInstall,
+    addToTasks,
     getInstallable,
     getInstalled,
     actions
@@ -227,4 +245,3 @@ const createPwaInstallReactor = ({
 }
 
 export default createPwaInstallReactor
-
