@@ -44,8 +44,8 @@ class Http extends React.Component<Props, {}> {
       <FetchHttpRequest id={request.id}
                         key={request.id}
                         params={request.params}
-                        onStateChange={(state, result) =>
-                          this.props.requestFinished(request, state, result) }
+                        onStateChange={(requestState, result) =>
+                          this.props.requestFinished(request, requestState, result) }
       />
     )
 
@@ -118,19 +118,22 @@ const createHttpReactor = ({
 
   /// sub-reducers
 
-  const addToOutbox = (state: any, params: any, effect: TrackedRequestEffects) =>
-    withImmer(state, (draft: any) => {
-      const stateSlice = getStateSlice(draft)
-      stateSlice.lastRequestId += 1
-      stateSlice.outbox.push({
-        id: stateSlice.lastRequestId,
-        effect,
-        params,
-        state: null,
-        data: null,
-        error: null
-      })
+  const addToOutbox = (
+    state: any,
+    params: any,
+    effect: TrackedRequestEffects
+  ) => withImmer(state, (draft: any) => {
+    const stateSlice = getStateSlice(draft)
+    stateSlice.lastRequestId += 1
+    stateSlice.outbox.push({
+      id: stateSlice.lastRequestId,
+      effect,
+      params,
+      requestState: 'queued',
+      data: null,
+      error: null
     })
+  })
 
   /// selectors
 

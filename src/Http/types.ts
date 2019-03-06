@@ -1,6 +1,6 @@
 import { JSONObject } from '../types'
 
-export type TrackedRequestState = 'success' | 'failure' | 'pending'
+export type TrackedRequestState = 'queued' | 'pending' | 'success' | 'failure'
 
 export interface TrackedRequestEffects {
   success: string
@@ -9,10 +9,10 @@ export interface TrackedRequestEffects {
 
 export interface TrackedHttpRequest {
   id: number
-  state: TrackedRequestState
+  requestState: TrackedRequestState
   effect: TrackedRequestEffects
   params: RequestInit & { url: RequestInfo }
-  data: JSONObject
+  data: null | JSONObject
   error: any // XXX specify better
 }
 
