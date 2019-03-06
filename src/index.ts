@@ -1,11 +1,11 @@
 import 'core-js/features/array/includes'
 import 'core-js/features/array/find-index'
 
-import HashLocation from './HashLocation'
-import Route from './Route'
-import DocumentTitle from './DocumentTitle'
 export { default as composeReducers } from 'reduce-reducers'
-export { HashLocation,
-         Route,
-         DocumentTitle }
-
+export { default as HashLocation } from './HashLocation'
+export { default as Route } from './Route'
+export { default as DocumentTitle } from './DocumentTitle'
+export { default as createHttpReactor } from './Http/index'
+export { default as createSocketReactor } from './Socket/index'
+export { default as createPwaInstallReactor } from './PwaInstall/index'
+export { default as createWebExtInstallReactor } from './WebExtInstall/index'
