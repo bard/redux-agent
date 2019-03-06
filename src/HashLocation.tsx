@@ -1,7 +1,6 @@
 import React from 'react'
 import Path from 'path-parser'
 import createDebug from 'debug'
-import { Component } from 'react'
 
 const debug = createDebug('reactor:HashLocation')
 
@@ -10,7 +9,7 @@ interface Props {
   enabled: boolean
 }
 
-class HashLocation extends Component<Props, any> {
+class HashLocation extends React.Component<Props, any> {
   constructor(props: Props) {
     super(props)
     this.locationDidChange = this.locationDidChange.bind(this)
