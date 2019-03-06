@@ -49,7 +49,8 @@
     "build": "rollup -c rollup.config.ts",
     "dev": "rollup -c rollup.config.ts -w",
     "lint": "tslint  --project tsconfig.json -t codeFrame",
-    "visualize": "source-map-explorer --html dist/redux-reactor.esm.js dist/redux-reactor.esm.js.map > source.html"
+    "visualize": "source-map-explorer --html dist/redux-reactor.esm.js dist/redux-reactor.esm.js.map > source.html",
+    "postinstall": "rimraf node_modules/@types/node && echo 'workaround for libs importing @types/node on browser environment'"
   },
   "peerDependencies": {
     "react": "^16.8.4",
