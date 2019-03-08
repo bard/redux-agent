@@ -29,7 +29,7 @@
     "@types/redux": "^3.6.0",
     "@types/sleep": "^0.0.7",
     "core-js": "^3.0.0-beta.16",
-    "debug": "^4.1.1",
+    "debug": "3",
     "editorconfig": "^0.15.2",
     "immer": "^2.1.1",
     "rimraf": "^2.6.3",
