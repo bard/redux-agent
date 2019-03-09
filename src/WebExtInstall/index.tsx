@@ -1,4 +1,3 @@
-import invariant from 'invariant'
 import produce, { isDraft } from 'immer'
 import createDebug from 'debug'
 import { createAction, ActionType, getType } from 'typesafe-actions'
@@ -55,7 +54,9 @@ class WebExtInstall extends React.Component<Props, {}> {
   }
 
   private async checkForWebExt() {
-    invariant(this.props.installState === 'unknown', 'bug')
+    if (this.props.installState === 'unknown') {
+      throw new Error(`Can only check for web ext while in state "unknown". Current state: ${this.props.installState}`)
+    }
 
     if ('chrome' in window &&
         typeof chrome.runtime !== 'undefined') {

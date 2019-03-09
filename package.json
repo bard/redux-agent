@@ -12,7 +12,6 @@
     "src"
   ],
   "dependencies": {
-    "invariant": "^2.2.4",
     "path-parser": "^4.2.0",
     "reconnecting-websocket": "^4.1.10",
     "reduce-reducers": "^0.4.3",
