@@ -6,15 +6,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withImmer, Fragment } from '../util'
 import FetchHttpRequest from './FetchHttpRequest'
-import { StateSlice,
-         TrackedHttpRequest,
-         TrackedRequestState,
-         TrackedRequestEffects } from './types'
+import {
+  StateSlice,
+  TrackedHttpRequest,
+  TrackedRequestState,
+  TrackedRequestEffects
+} from './types'
 
 const debug = createDebug('reactor:Http')
-
-interface PropsFromUser {
-}
 
 interface PropsFromState {
   outbox: any[]
@@ -22,11 +21,11 @@ interface PropsFromState {
 
 interface PropsFromDispatch {
   requestFinished(request: TrackedHttpRequest,
-                  state: TrackedRequestState,
-                  result: any): void
+    state: TrackedRequestState,
+    result: any): void
 }
 
-type Props = PropsFromUser & PropsFromState & PropsFromDispatch
+type Props = PropsFromState & PropsFromDispatch
 
 class Http extends React.Component<Props, {}> {
   componentDidMount() {
@@ -34,7 +33,7 @@ class Http extends React.Component<Props, {}> {
       throw new Error('window.fetch() is not available.')
     }
   }
-  
+
   render() {
     debug('render')
     if (!this.props.outbox) {
@@ -43,14 +42,14 @@ class Http extends React.Component<Props, {}> {
 
     const requests = this.props.outbox.map((request) =>
       <FetchHttpRequest id={request.id}
-                        key={request.id}
-                        params={request.params}
-                        onStateChange={(requestState, result) =>
-                          this.props.requestFinished(request, requestState, result) }
+        key={request.id}
+        params={request.params}
+        onStateChange={(requestState, result) =>
+          this.props.requestFinished(request, requestState, result)}
       />
     )
 
-    return <Fragment>{ requests }</Fragment>
+    return <Fragment>{requests}</Fragment>
   }
 }
 
@@ -63,10 +62,10 @@ const createHttpReactor = ({
 
   const actions = {
     requestFinished: createAction(`${actionPrefix}REQUEST_FINISHED`)
-  }  
-  
+  }
+
   /// connected component
-  
+
   const mapStateToProps = (state: any): PropsFromState => ({
     outbox: getStateSlice(state).outbox
   })
@@ -80,8 +79,8 @@ const createHttpReactor = ({
 
       dispatch({
         type: (state === 'success'
-             ? request.effect.success
-             : request.effect.failure),
+          ? request.effect.success
+          : request.effect.failure),
         meta: {
           requestId: request.id,
           requestParams: request.params
@@ -105,8 +104,8 @@ const createHttpReactor = ({
         outbox: []
       }
     }
-    
-    switch(action.type) {
+
+    switch (action.type) {
       case getType(actions.requestFinished):
         const stateSlice = getStateSlice(draft)
         const index = findIndex(stateSlice.outbox,
@@ -139,7 +138,7 @@ const createHttpReactor = ({
   /// selectors
 
   /// exports
-  
+
   return {
     Component,
     reducer,

@@ -18,6 +18,7 @@
       "check-separator",
       "check-type",
       "check-typecast"
-    ]
+    ],
+    "align": [true, "statements", "members", "elements"]
   }
 }

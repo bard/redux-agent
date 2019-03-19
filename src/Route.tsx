@@ -8,4 +8,3 @@ const Route = (_: Props) => (
 )
 
 export default Route
-

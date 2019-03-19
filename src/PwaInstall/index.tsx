@@ -106,7 +106,7 @@ class PwaInstall extends React.Component<Props, {}> {
     if (this.giveupWaitingForInstallPromptTimeoutId === null) {
       throw new Error('Bug: install timeout was not set.')
     }
-    
+
     window.clearTimeout(this.giveupWaitingForInstallPromptTimeoutId)
     // Prevent Chrome 67 and earlier from automatically showing the prompt
     event.preventDefault()
@@ -136,10 +136,10 @@ interface StateSlice {
 }
 
 type InstallState = 'unknown'
-                  | 'not-installable'
-                  | 'installable'
-                  | 'installing'
-                  | 'installed'
+  | 'not-installable'
+  | 'installable'
+  | 'installing'
+  | 'installed'
 
 type Task = 'install'
 
@@ -223,7 +223,7 @@ const createPwaInstallReactor = ({
   const addToTasks = <S extends {}>(
     state: S, task: Task
   ): S => withImmer(state, (draft: S) => {
-    switch(task) {
+    switch (task) {
       case 'install':
         getStateSlice(draft).installDesired = true
         break

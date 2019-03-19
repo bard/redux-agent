@@ -41,13 +41,16 @@
     "source-map-explorer": "^1.7.0",
     "tslint": "^5.13.1",
     "typesafe-actions": "^3.2.1",
-    "typescript": "^3.3.1"
+    "typescript": "^3.3.1",
+    "typescript-formatter": "^7.2.2"
   },
   "scripts": {
+    "dev": "rollup -c rollup.config.ts -w",
     "prebuild": "rimraf dist",
     "build": "rollup -c rollup.config.ts",
-    "dev": "rollup -c rollup.config.ts -w",
-    "lint": "tslint  --project tsconfig.json -t codeFrame",
+    "fix": "tslint --project . --fix && tsfmt -r",
+    "lint": "tslint --project . && tsfmt --verify -r",
+    "compilecheck": "tsc --noEmit --pretty false",
     "visualize": "source-map-explorer --html dist/redux-reactor.esm.js dist/redux-reactor.esm.js.map > source.html",
     "postinstall": "rimraf node_modules/@types/node && echo 'workaround for libs importing @types/node on browser environment'"
   },
@@ -62,8 +65,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsc --noEmit --pretty false",
-      "pr-push": "tsc --noEmit --pretty false"
+      "pre-commit": "yarn compilecheck && yarn lint",
+      "pr-push": "yarn compilecheck && yarn lint"
     }
   }
 }

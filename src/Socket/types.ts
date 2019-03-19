@@ -1,5 +1,5 @@
-type JSONObject = {[key: string]: JSONValue}
-interface JSONArray extends Array<JSONValue> {}
+interface JSONObject { [key: string]: JSONValue }
+interface JSONArray extends Array<JSONValue> { }
 type JSONValue = string | number | boolean | null | JSONObject | JSONArray
 
 export type SocketConnectionState = 'connected' | 'disconnected'

@@ -87,7 +87,7 @@ class HashLocation extends React.Component<Props, any> {
   private findMatchingRoute(location: string, routes: any[]) {
     // XXX generate Path objects somewhere and just use them here
     return routes.reduce(
-      (match, { props: { pattern, onMatch }}) => {
+      (match, { props: { pattern, onMatch } }) => {
         if (match) {
           return match
         } else {

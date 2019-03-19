@@ -40,11 +40,11 @@ class WebExtInstall extends React.Component<Props, {}> {
   componentDidUpdate(prevProps: Props) {
     debug('componentDidUpdate', this.props.installDesired)
     if (this.props.installDesired !== prevProps.installDesired &&
-        this.props.installDesired === true) {
+      this.props.installDesired === true) {
       this.props.installing()
       window.open(this.getInstallUrl())
     } else if (this.props.installState !== prevProps.installState &&
-               this.props.installState === 'installing') {
+      this.props.installState === 'installing') {
       this.pollForInstallStatus()
     }
   }
@@ -59,7 +59,7 @@ class WebExtInstall extends React.Component<Props, {}> {
     }
 
     if ('chrome' in window &&
-        typeof chrome.runtime !== 'undefined') {
+      typeof chrome.runtime !== 'undefined') {
       if (await this.isWebExtInstalled(this.getExtId())) {
         this.props.installed()
       } else {
@@ -72,7 +72,8 @@ class WebExtInstall extends React.Component<Props, {}> {
 
   private pollForInstallStatus() {
     if (this.props.installState !== 'installing') {
-      throw new Error(`Can only poll for install status once installation begins. Current state: ${this.props.installState}`)
+      throw new Error('Can only poll for install status once installation begins.' +
+        `Current state: ${this.props.installState}`)
     }
 
     if (this.installStatusPollInterval !== null) {
@@ -137,10 +138,10 @@ interface StateSlice {
 }
 
 type InstallState = 'unknown'
-                  | 'not-installable'
-                  | 'installable'
-                  | 'installing'
-                  | 'installed'
+  | 'not-installable'
+  | 'installable'
+  | 'installing'
+  | 'installed'
 
 type Task = 'install'
 
@@ -216,7 +217,7 @@ const createWebExtInstallReactor = ({
     state: S,
     task: Task
   ): S => withImmer(state, (draft: S) => {
-    switch(task) {
+    switch (task) {
       case 'install':
         getStateSlice(draft).installDesired = true
         break

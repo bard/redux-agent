@@ -1,6 +1,5 @@
 declare type JSONType = import('./types').JSONObject
 
-
 declare module module {
   export const hot: any
 }

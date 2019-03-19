@@ -4,10 +4,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { Fragment, withImmer } from '../util'
-import { SocketConnectionState,
-         TrackedSocketMessage,
-         SocketMessage,
-         SocketState } from './types'
+import {
+  SocketConnectionState,
+  TrackedSocketMessage,
+  SocketMessage,
+  SocketState
+} from './types'
 import OutgoingSocketMessage from './OutgoingSocketMessage'
 
 declare const Primus: any
@@ -39,11 +41,11 @@ class Socket extends React.Component<Props, {}> {
   static defaultProps: DefaultProps = {
     mode: 'websocket'
   }
-  
+
   private socket: any = null
-  
+
   private hotReloading: boolean = false
-  
+
   constructor(props: Props) {
     super(props)
     debug('constructor')
@@ -72,15 +74,15 @@ class Socket extends React.Component<Props, {}> {
 
   render() {
     const { outbox = [] } = this.props
-    
+
     return (
       <Fragment>
-        { outbox.map(message =>
+        {outbox.map((message) =>
           <OutgoingSocketMessage send={this.send.bind(this)}
-                                 key={message.id}
-                                 id={message.id}
-                                 data={message.data}
-                                 onSent={() => this.messageWasSent(message.id)} />
+            key={message.id}
+            id={message.id}
+            data={message.data}
+            onSent={() => this.messageWasSent(message.id)} />
         )}
       </Fragment>
     )
@@ -89,7 +91,7 @@ class Socket extends React.Component<Props, {}> {
   private send(data: any) {
     this.socket.sendJSON(data)
   }
-  
+
   private messageWasSent(id: number) {
     this.props.messageSent(id)
   }
@@ -115,6 +117,7 @@ class Socket extends React.Component<Props, {}> {
         }
       } else if (module.hot.accept.length === 2) {
         // It's WebPack
+        // tslint:disable-next-line
         console.warn('WebPack HMR currently not supported.')
       }
     }
@@ -129,8 +132,8 @@ class Socket extends React.Component<Props, {}> {
     debug('updateConnectionState')
 
     const currentState = this.socket && this.socket.readyState === this.socket.OPEN
-                       ? 'connected'
-                       : 'disconnected'
+      ? 'connected'
+      : 'disconnected'
     if (currentState !== desiredState) {
       debug('updating socket', { currentState, desiredState })
       if (desiredState === 'disconnected') {
@@ -142,7 +145,7 @@ class Socket extends React.Component<Props, {}> {
   }
 
   private createSocket() {
-    switch(this.props.mode) {
+    switch (this.props.mode) {
       case 'websocket':
         this.createWebSocket()
         break
@@ -156,7 +159,6 @@ class Socket extends React.Component<Props, {}> {
   private createWebSocket() {
     debug('createSocket')
     this.socket = new ReconnectingWebSocket(this.props.connectionUrl)
-    this.socket.close
     this.socket.sendJSON = function(data: any) {
       return this.send(JSON.stringify(data))
     }
@@ -179,10 +181,10 @@ class Socket extends React.Component<Props, {}> {
     if (!('Primus' in window)) {
       throw new Error('Primus not available.')
     }
-    
+
     this.socket = Primus.connect({
       reconnect: {
-        strategy: [ 'disconnect', 'online' ], // XXX why?
+        strategy: ['disconnect', 'online'], // XXX why?
         max: 20000,
         min: 1000,
         retries: 50
@@ -213,7 +215,7 @@ class Socket extends React.Component<Props, {}> {
     this.socket.on('data', (data: any) => {
       this.props.onMessageReceived(data)
     })
-  }  
+  }
 }
 
 const createSocketReactor = ({
@@ -237,7 +239,7 @@ const createSocketReactor = ({
         payload: newConnectionState
       })
     },
-    
+
     messageSent(id: number) {
       dispatch({
         type: actionPrefix + 'MESSAGE_SENT',
@@ -250,9 +252,9 @@ const createSocketReactor = ({
     mapStateToProps,
     mapDispatchToProps
   )(Socket)
-  
+
   /// reducer
-  
+
   const reducer = (state: any, action: any) => withImmer(state, (draft: any) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
@@ -263,7 +265,7 @@ const createSocketReactor = ({
       }
     }
 
-    switch(action.type) {
+    switch (action.type) {
       case actionPrefix + 'MESSAGE_SENT':
         const stateSlice = getStateSlice(draft)
         const index = findIndex(
@@ -281,7 +283,7 @@ const createSocketReactor = ({
   })
 
   /// sub-reducers
-  
+
   const addToOutbox = (state: any, data: any) => withImmer(state, (draft: any) => {
     const stateSlice = getStateSlice(draft)
     stateSlice.lastMessageId += 1

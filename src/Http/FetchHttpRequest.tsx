@@ -27,7 +27,7 @@ class HttpRequest extends Component<Props, any> {
 
     const response = await fetch(url, {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...params.headers,
       },
       credentials: 'same-origin',
@@ -37,7 +37,7 @@ class HttpRequest extends Component<Props, any> {
     if (response.ok) {
       const contentType = response.headers.get('content-type')
       if (contentType &&
-          contentType.indexOf('application/json') !== -1) {
+        contentType.indexOf('application/json') !== -1) {
         const json = await response.json()
         this.props.onStateChange('success', json)
       } else {
