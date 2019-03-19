@@ -231,8 +231,8 @@ const createWebExtInstallReactor = ({
     getStateSlice(state).installState
 
   const getInstallable = (state: any) =>
-    ['installable', 'installing'].includes(
-      getStateSlice(state).installState)
+    ['installable', 'installing'].indexOf(
+      getStateSlice(state).installState) !== -1
 
   const getInstalled = (state: any) =>
     getStateSlice(state).installState === 'installed'

@@ -1,6 +1,3 @@
-import 'core-js/features/array/includes'
-import 'core-js/features/array/find-index'
-
 export { default as composeReducers } from 'reduce-reducers'
 export { default as HashLocation } from './HashLocation'
 export { default as Route } from './Route'

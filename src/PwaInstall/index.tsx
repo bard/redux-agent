@@ -96,7 +96,7 @@ class PwaInstall extends React.Component<Props, {}> {
   private async checkForPwa() {
     if ('getInstalledRelatedApps' in navigator) {
       const relatedApps = await navigator.getInstalledRelatedApps()
-      if (relatedApps.includes('XXX')) {
+      if (relatedApps.indexOf('XXX') !== -1) {
         this.props.installed()
       }
     }
@@ -235,7 +235,7 @@ const createPwaInstallReactor = ({
   /// selectors
 
   const getInstallable = (state: any) =>
-    ['installable', 'installing'].includes(getStateSlice(state).installState)
+    ['installable', 'installing'].indexOf(getStateSlice(state).installState) !== -1
 
   const getInstalled = (state: any) =>
     getStateSlice(state).installState === 'installed'

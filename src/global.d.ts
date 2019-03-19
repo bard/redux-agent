@@ -11,18 +11,11 @@ declare interface WebSocket {
 
 // Polyfills
 
-declare module 'core-js/features/array/includes'
-declare module 'core-js/features/array/find-index'
+declare module 'core-js-pure/features/array/find-index' {
+  function _<T>(
+    a: T[],
+    predicate: (value: T, index: number, obj: T[]) => boolean,
+    thisArg?: any): number
 
-interface Array<T> {
-  
-  // Copied from <typescript>/es2016.array.include.d.ts
-  // Polyfill imported in index.ts from core-js
-  
-  findIndex(predicate: (value: T, index: number, obj: T[]) => boolean, thisArg?: any): number
-
-  // Copied from <typescript>/es2015.core.d.ts
-  // Polyfill imported in index.ts from core-js
-  
-  includes(searchElement: T, fromIndex?: number): boolean
+  export = _
 }
