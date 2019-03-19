@@ -10,6 +10,8 @@ interface Props {
 }
 
 class HashLocation extends React.Component<Props, any> {
+  firstRun = true
+
   constructor(props: Props) {
     super(props)
     this.locationDidChange = this.locationDidChange.bind(this)
@@ -38,8 +40,11 @@ class HashLocation extends React.Component<Props, any> {
       this.updateLocation()
     }
 
-    if (prevProps.enabled !== this.props.enabled) {
+    if (prevProps.enabled !== this.props.enabled &&
+      this.firstRun) {
       debug('enabled changed')
+      this.firstRun = false
+      this.locationDidChange()
     }
   }
 
@@ -48,6 +53,13 @@ class HashLocation extends React.Component<Props, any> {
   }
 
   private updateLocation() {
+    debug('updateLocation')
+
+    if (!this.props.enabled) {
+      debug('navigation disabled, skipping')
+      return
+    }
+
     const newLocation = '#' + this.props.location
     if (window.location.hash === newLocation) {
       debug(`location already at ${newLocation}, skipping update`)
@@ -61,19 +73,19 @@ class HashLocation extends React.Component<Props, any> {
 
   private locationDidChange() {
     debug('locationDidChange')
-    
-    if (this.props.enabled) {
-      const locationInput = window.location.hash.substr(1) || '/'
-      const matchingRoute = this.findMatchingRoute(
-        locationInput,
-        React.Children.toArray(this.props.children)
-      )
-      if (matchingRoute) {
-        matchingRoute.onMatch(matchingRoute.params)
-      }
-    } else {
-      debug('navigation disabled')
-      this.updateLocation()
+
+    if (!this.props.enabled) {
+      debug('navigation disabled, skipping')
+      return
+    }
+
+    const locationInput = window.location.hash.substr(1) || '/'
+    const matchingRoute = this.findMatchingRoute(
+      locationInput,
+      React.Children.toArray(this.props.children)
+    )
+    if (matchingRoute) {
+      matchingRoute.onMatch(matchingRoute.params)
     }
   }
 
