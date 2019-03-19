@@ -14,8 +14,7 @@
   "dependencies": {
     "path-parser": "^4.2.0",
     "reconnecting-websocket": "^4.1.10",
-    "reduce-reducers": "^0.4.3",
-    "then-sleep": "^1.0.1"
+    "reduce-reducers": "^0.4.3"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.81",
