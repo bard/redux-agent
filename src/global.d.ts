@@ -9,14 +9,6 @@ declare interface WebSocket {
   sendJSON(data: any): void
 }
 
-// Workaround for using immer in projects targeting ES5.
-// https://github.com/mweststrate/immer/issues/321
-
-declare interface Map<K, V> {}
-declare interface WeakMap<K, V> {}
-declare interface WeakSet<K> {}
-declare interface Set<K> {}
-
 // Polyfills
 
 declare module 'core-js/features/array/includes'
