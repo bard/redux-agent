@@ -48,6 +48,7 @@
     "dev": "rollup -c rollup.config.ts -w",
     "prebuild": "rimraf dist",
     "build": "rollup -c rollup.config.ts",
+    "prepare": "rollup -c rollup.config.ts",
     "fix": "tslint --project . --fix && tsfmt -r",
     "lint": "tslint --project . && tsfmt --verify -r",
     "compilecheck": "tsc --noEmit --pretty false",
