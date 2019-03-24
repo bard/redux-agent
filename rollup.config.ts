@@ -13,7 +13,7 @@ export default [
   // {
   //   input: 'src/index.ts',
   //   output: {
-  //     name: 'ReduxReactor',
+  //     name: 'ReduxAgent',
   //     file: pkg.browser,
   //     format: 'umd',
   //     sourcemap: true
@@ -53,8 +53,8 @@ export default [
       }),
       commonjs({
         namedExports: {
-          'node_modules/typesafe-actions/dist/index.umd.js': [ 'createAction', 'getType', 'ActionType' ],
-          'node_modules/react/index.js': [ 'Component' ]
+          'node_modules/typesafe-actions/dist/index.umd.js': ['createAction', 'getType', 'ActionType'],
+          'node_modules/react/index.js': ['Component']
         }
       }),
       terser()

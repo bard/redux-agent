@@ -2,7 +2,7 @@ import createDebug from 'debug'
 import { Component } from 'react'
 import { TrackedRequestState } from './types'
 
-const debug = createDebug('reactor:FetchHttpRequest')
+const debug = createDebug('agent:FetchHttpRequest')
 
 interface Props {
   id: number

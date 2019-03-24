@@ -13,7 +13,7 @@ import {
   TrackedRequestEffects
 } from './types'
 
-const debug = createDebug('reactor:Http')
+const debug = createDebug('agent:Http')
 
 interface PropsFromState {
   outbox: any[]
@@ -53,7 +53,7 @@ class Http extends React.Component<Props, {}> {
   }
 }
 
-const createHttpReactor = ({
+const createHttpAgent = ({
   actionPrefix = 'HTTP_', stateKey = 'http'
 } = {}) => {
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
@@ -146,4 +146,4 @@ const createHttpReactor = ({
   }
 }
 
-export default createHttpReactor
+export default createHttpAgent

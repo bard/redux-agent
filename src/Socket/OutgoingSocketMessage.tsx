@@ -1,7 +1,7 @@
 import createDebug from 'debug'
 import { Component } from 'react'
 
-const debug = createDebug('reactor:Socket:OutgoingSocketMessage')
+const debug = createDebug('agent:Socket:OutgoingSocketMessage')
 
 // ----------------------------------------------------------------------
 

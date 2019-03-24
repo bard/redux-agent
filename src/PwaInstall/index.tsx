@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const debug = createDebug('reactor:PwaInstall')
+const debug = createDebug('agent:PwaInstall')
 
 interface PropsFromState {
   installDesired: boolean
@@ -143,7 +143,7 @@ type InstallState = 'unknown'
 
 type Task = 'install'
 
-const createPwaInstallReactor = ({
+const createPwaInstallAgent = ({
   actionPrefix = 'PWA_', stateKey = 'pwa'
 } = {}) => {
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
@@ -250,4 +250,4 @@ const createPwaInstallReactor = ({
   }
 }
 
-export default createPwaInstallReactor
+export default createPwaInstallAgent

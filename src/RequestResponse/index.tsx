@@ -15,7 +15,7 @@ import {
 } from './types'
 import Request from './Request'
 
-const createRequestResponseReactor = <TrackedRequestParams extends {}>(
+const createRequestResponseAgent = <TrackedRequestParams extends {}>(
   { actionPrefix, stateKey, taskHandler }: FactoryArgs<TrackedRequestParams>
 ): FactoryResult<TrackedRequestParams> => {
 
@@ -36,7 +36,7 @@ const createRequestResponseReactor = <TrackedRequestParams extends {}>(
 
   type Props = PropsFromState & PropsFromDispatch
 
-  class RequestResponseReactor
+  class RequestResponseAgent
     extends React.Component<Props, {}> {
     render() {
       if (!this.props.requests) {
@@ -107,7 +107,7 @@ const createRequestResponseReactor = <TrackedRequestParams extends {}>(
   const Component = connect(
     mapStateToProps,
     mapDispatchToProps
-  )(RequestResponseReactor)
+  )(RequestResponseAgent)
 
   // REDUCER
   // ----------------------------------------------------------------------
@@ -149,7 +149,7 @@ const createRequestResponseReactor = <TrackedRequestParams extends {}>(
     })
   })
 
-  // REACTOR INTERFACE
+  // AGENT INTERFACE
   // ----------------------------------------------------------------------
 
   return {
@@ -159,4 +159,4 @@ const createRequestResponseReactor = <TrackedRequestParams extends {}>(
   }
 }
 
-export default createRequestResponseReactor
+export default createRequestResponseAgent

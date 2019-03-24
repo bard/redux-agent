@@ -1,10 +1,10 @@
 {
   "private": true,
-  "name": "redux-reactor",
+  "name": "redux-agent",
   "version": "0.1.0",
-  "main": "dist/redux-reactor.cjs.js",
-  "module": "dist/redux-reactor.esm.js",
-  "browser": "dist/redux-reactor.umd.js",
+  "main": "dist/redux-agent.cjs.js",
+  "module": "dist/redux-agent.esm.js",
+  "browser": "dist/redux-agent.umd.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
   "files": [
@@ -51,7 +51,7 @@
     "fix": "tslint --project . --fix && tsfmt -r",
     "lint": "tslint --project . && tsfmt --verify -r",
     "compilecheck": "tsc --noEmit --pretty false",
-    "visualize": "source-map-explorer --html dist/redux-reactor.esm.js dist/redux-reactor.esm.js.map > source.html",
+    "visualize": "source-map-explorer --html dist/redux-agent.esm.js dist/redux-agent.esm.js.map > source.html",
     "postinstall": "rimraf node_modules/@types/node && echo 'workaround for libs importing @types/node on browser environment'"
   },
   "peerDependencies": {

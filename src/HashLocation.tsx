@@ -2,7 +2,7 @@ import React from 'react'
 import Path from 'path-parser'
 import createDebug from 'debug'
 
-const debug = createDebug('reactor:HashLocation')
+const debug = createDebug('agent:HashLocation')
 
 interface Props {
   location: string

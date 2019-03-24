@@ -6,7 +6,7 @@ import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { sendChromeMessage } from './util'
 
-const debug = createDebug('reactor:WebExtInstall')
+const debug = createDebug('agent:WebExtInstall')
 
 interface PropsFromUser {
   chromeInstallUrl?: string
@@ -145,7 +145,7 @@ type InstallState = 'unknown'
 
 type Task = 'install'
 
-const createWebExtInstallReactor = ({
+const createWebExtInstallAgent = ({
   actionPrefix = 'WEB_EXT_', stateKey = 'webExt'
 } = {}) => {
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
@@ -249,4 +249,4 @@ const createWebExtInstallReactor = ({
   }
 }
 
-export default createWebExtInstallReactor
+export default createWebExtInstallAgent

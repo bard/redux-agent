@@ -13,7 +13,7 @@ import {
 import OutgoingSocketMessage from './OutgoingSocketMessage'
 
 declare const Primus: any
-const debug = createDebug('reactor:Socket')
+const debug = createDebug('agent:Socket')
 
 interface PropsFromUser {
   connectionUrl: string
@@ -218,7 +218,7 @@ class Socket extends React.Component<Props, {}> {
   }
 }
 
-const createSocketReactor = ({
+const createSocketAgent = ({
   stateKey = 'socket',
   actionPrefix = 'SOCKET_'
 } = {}) => {
@@ -307,4 +307,4 @@ const createSocketReactor = ({
   }
 }
 
-export default createSocketReactor
+export default createSocketAgent
