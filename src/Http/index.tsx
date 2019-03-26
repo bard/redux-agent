@@ -16,7 +16,7 @@ import {
 const debug = createDebug('agent:Http')
 
 interface PropsFromState {
-  outbox: any[]
+  tasks: any[]
 }
 
 interface PropsFromDispatch {
@@ -36,11 +36,11 @@ class Http extends React.Component<Props, {}> {
 
   render() {
     debug('render')
-    if (!this.props.outbox) {
+    if (!this.props.tasks) {
       return null
     }
 
-    const requests = this.props.outbox.map((request) =>
+    const requests = this.props.tasks.map((request) =>
       <FetchHttpRequest id={request.id}
         key={request.id}
         params={request.params}
@@ -67,7 +67,7 @@ const createHttpAgent = ({
   /// connected component
 
   const mapStateToProps = (state: any): PropsFromState => ({
-    outbox: getStateSlice(state).outbox
+    tasks: getStateSlice(state).outbox
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
@@ -118,7 +118,7 @@ const createHttpAgent = ({
 
   /// sub-reducers
 
-  const addToOutbox = (
+  const addTask = (
     state: any,
     params: any,
     effect: TrackedRequestEffects
@@ -142,7 +142,8 @@ const createHttpAgent = ({
   return {
     Component,
     reducer,
-    addToOutbox
+    addTask,
+    addToOutbox: addTask
   }
 }
 
