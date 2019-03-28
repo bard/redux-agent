@@ -14,17 +14,17 @@ import {
 
 const debug = createDebug('agent:Http')
 
-interface PropsFromState {
+interface StateProps {
   tasks: any[]
 }
 
-interface PropsFromDispatch {
+interface DispatchProps {
   requestFinished(request: TrackedHttpRequest,
     state: TrackedRequestState,
     result: any): void
 }
 
-type Props = PropsFromState & PropsFromDispatch
+type Props = StateProps & DispatchProps
 
 class Http extends React.Component<Props, {}> {
   componentDidMount() {
@@ -65,11 +65,11 @@ const createHttpAgent = ({
 
   /// connected component
 
-  const mapStateToProps = (state: any): PropsFromState => ({
+  const mapStateToProps = (state: any): StateProps => ({
     tasks: getStateSlice(state).outbox
   })
 
-  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
+  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): DispatchProps => ({
     requestFinished(request: TrackedHttpRequest, state, result) {
       dispatch({
         type: actionPrefix + 'REQUEST_FINISHED',

@@ -21,11 +21,11 @@ const createRequestResponseAgent = <TrackedRequestParams extends {}>(
   // COMPONENT
   // ----------------------------------------------------------------------
 
-  interface PropsFromState {
+  interface StateProps {
     requests: TrackedRequest[]
   }
 
-  interface PropsFromDispatch {
+  interface DispatchProps {
     requestStateChanged(
       request: TrackedRequest,
       state: TrackedRequestState,
@@ -33,7 +33,7 @@ const createRequestResponseAgent = <TrackedRequestParams extends {}>(
     ): void
   }
 
-  type Props = PropsFromState & PropsFromDispatch
+  type Props = StateProps & DispatchProps
 
   class RequestResponseAgent
     extends React.Component<Props, {}> {
@@ -77,13 +77,13 @@ const createRequestResponseAgent = <TrackedRequestParams extends {}>(
   // CONNECTED COMPONENT
   // ----------------------------------------------------------------------
 
-  const mapStateToProps = (state: any): PropsFromState => ({
+  const mapStateToProps = (state: any): StateProps => ({
     requests: getStateSlice(state).requests
   })
 
   const mapDispatchToProps = (
     dispatch: Dispatch<ActionType<typeof actions>>
-  ): PropsFromDispatch => ({
+  ): DispatchProps => ({
     requestStateChanged(r, state, result) {
       dispatch({
         type: actionPrefix + 'TASK_FINISHED',

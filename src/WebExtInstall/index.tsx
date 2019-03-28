@@ -8,26 +8,26 @@ import { sendChromeMessage } from './util'
 
 const debug = createDebug('agent:WebExtInstall')
 
-interface PropsFromUser {
+interface OwnProps {
   chromeInstallUrl?: string
   chromeExtId?: string
   firefoxInstallUrl?: string
   firefoxExtId?: string
 }
 
-interface PropsFromState {
+interface StateProps {
   installDesired: boolean
   installState: InstallState
 }
 
-interface PropsFromDispatch {
+interface DispatchProps {
   installed(): void
   installable(): void
   notInstallable(): void
   installing(): void
 }
 
-type Props = PropsFromUser & PropsFromState & PropsFromDispatch
+type Props = OwnProps & StateProps & DispatchProps
 
 class WebExtInstall extends React.Component<Props, {}> {
   private installStatusPollInterval: number | null = null
@@ -161,12 +161,12 @@ const createWebExtInstallAgent = ({
 
   /// connected component
 
-  const mapStateToProps = (state: any): PropsFromState => ({
+  const mapStateToProps = (state: any): StateProps => ({
     installDesired: getStateSlice(state).installDesired,
     installState: getStateSlice(state).installState
   })
 
-  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
+  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): DispatchProps => ({
     installed() { dispatch(actions.installed()) },
     installable() { dispatch(actions.installable()) },
     notInstallable() { dispatch(actions.notInstallable()) },

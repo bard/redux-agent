@@ -14,11 +14,11 @@ declare global {
 
 const debug = createDebug('agent:PwaInstall')
 
-interface PropsFromState {
+interface StateProps {
   installDesired: boolean
 }
 
-interface PropsFromDispatch {
+interface DispatchProps {
   installed(): void
   installable(): void
   notInstallable(): void
@@ -27,7 +27,7 @@ interface PropsFromDispatch {
   installProgress(): void
 }
 
-type Props = PropsFromState & PropsFromDispatch
+type Props = StateProps & DispatchProps
 
 class PwaInstall extends React.Component<Props, {}> {
   beforeInstallPromptEvent: BeforeInstallPromptEvent | null = null
@@ -161,11 +161,11 @@ const createPwaInstallAgent = ({
 
   /// connected component
 
-  const mapStateToProps = (state: any): PropsFromState => ({
+  const mapStateToProps = (state: any): StateProps => ({
     installDesired: getStateSlice(state).installDesired
   })
 
-  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): PropsFromDispatch => ({
+  const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): DispatchProps => ({
     installed() { dispatch(actions.installed()) },
     installable() { dispatch(actions.installable()) },
     notInstallable() { dispatch(actions.notInstallable()) },

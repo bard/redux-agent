@@ -14,18 +14,18 @@ import OutgoingSocketMessage from './OutgoingSocketMessage'
 declare const Primus: any
 const debug = createDebug('agent:Socket')
 
-interface PropsFromUser {
+interface OwnProps {
   connectionUrl: string
   onMessageReceived(data: SocketMessage): void
 }
 
-interface PropsFromState {
+interface StateProps {
   lastMessageId: number // XXX mark as readonly
   desiredState: null | SocketConnectionState
   outbox: TrackedSocketMessage[]
 }
 
-interface PropsFromDispatch {
+interface DispatchProps {
   stateChanged(newConnectionState: SocketConnectionState): void
   messageSent(id: number): void
 }
@@ -34,7 +34,7 @@ interface DefaultProps {
   mode: 'websocket' | 'primus'
 }
 
-type Props = PropsFromUser & PropsFromState & PropsFromDispatch & DefaultProps
+type Props = OwnProps & StateProps & DispatchProps & DefaultProps
 
 class Socket extends React.Component<Props, {}> {
   static defaultProps: DefaultProps = {
@@ -225,13 +225,13 @@ const createSocketAgent = ({
 
   /// actions
 
-  const mapStateToProps = (state: any): PropsFromState => ({
+  const mapStateToProps = (state: any): StateProps => ({
     lastMessageId: getStateSlice(state).lastMessageId,
     outbox: getStateSlice(state).outbox,
     desiredState: getStateSlice(state).desiredState
   })
 
-  const mapDispatchToProps = (dispatch: any): PropsFromDispatch => ({
+  const mapDispatchToProps = (dispatch: any): DispatchProps => ({
     stateChanged(newConnectionState: SocketConnectionState) {
       dispatch({
         type: actionPrefix + 'STATE_CHANGED',
