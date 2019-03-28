@@ -1,10 +1,9 @@
-import findIndex from 'core-js-pure/features/array/find-index'
 import createDebug from 'debug'
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import { Dispatch } from 'redux'
 import React from 'react'
 import { connect } from 'react-redux'
-import { withImmer, Fragment } from '../util'
+import { withImmer, Fragment, findIndex } from '../util'
 import FetchHttpRequest from './FetchHttpRequest'
 import {
   StateSlice,

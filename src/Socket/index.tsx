@@ -1,9 +1,8 @@
-import findIndex from 'core-js-pure/features/array/find-index'
 import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
 import ReconnectingWebSocket from 'reconnecting-websocket'
-import { Fragment, withImmer } from '../util'
+import { Fragment, withImmer, findIndex } from '../util'
 import {
   SocketConnectionState,
   TrackedSocketMessage,
