@@ -11,7 +11,6 @@ import {
 } from './types'
 import OutgoingSocketMessage from './OutgoingSocketMessage'
 
-declare const Primus: any
 const debug = createDebug('agent:Socket')
 
 interface OwnProps {
@@ -31,14 +30,23 @@ interface DispatchProps {
 }
 
 interface DefaultProps {
-  mode: 'websocket' | 'primus'
+  socketFactory: (connectionUrl: string) => MinimalWebSocket
+  wireFormat: null | 'json'
 }
+
+export type MinimalWebSocket = Pick<WebSocket,
+  'OPEN' | 'CONNECTING' | 'CLOSING' | 'onopen' | 'onclose' |
+  'onmessage' | 'close' | 'send'
+>
 
 type Props = OwnProps & StateProps & DispatchProps & DefaultProps
 
 class Socket extends React.Component<Props, {}> {
   static defaultProps: DefaultProps = {
-    mode: 'websocket'
+    socketFactory: (connectionUrl: string): MinimalWebSocket =>
+      // @ts-ignore
+      new ReconnectingWebSocket(connectionUrl),
+    wireFormat: 'json'
   }
 
   private socket: any = null
@@ -88,11 +96,28 @@ class Socket extends React.Component<Props, {}> {
   }
 
   private send(data: any) {
-    this.socket.sendJSON(data)
+    this.socket.send(
+      this.encode(data))
   }
 
   private messageWasSent(id: number) {
     this.props.messageSent(id)
+  }
+
+  private encode(data: any) {
+    if (this.props.wireFormat === 'json') {
+      return JSON.stringify(data)
+    } else {
+      return data
+    }
+  }
+
+  private decode(data: any) {
+    if (this.props.wireFormat === 'json') {
+      return JSON.parse(data)
+    } else {
+      return data
+    }
   }
 
   private setupHMR() {
@@ -144,76 +169,19 @@ class Socket extends React.Component<Props, {}> {
   }
 
   private createSocket() {
-    switch (this.props.mode) {
-      case 'websocket':
-        this.createWebSocket()
-        break
+    this.socket = this.props.socketFactory(this.props.connectionUrl)
 
-      case 'primus':
-        this.createPrimusSocket()
-        break
-    }
-  }
-
-  private createWebSocket() {
-    debug('createSocket')
-    this.socket = new ReconnectingWebSocket(this.props.connectionUrl)
-    this.socket.sendJSON = function(data: any) {
-      return this.send(JSON.stringify(data))
-    }
-    this.socket.addEventListener('open', () => {
+    this.socket.onopen = () => {
       this.props.stateChanged('connected')
-    })
-    this.socket.addEventListener('close', () => {
-      this.props.stateChanged('disconnected')
-    })
-    this.socket.addEventListener('message', ({ data }: MessageEvent) => {
-      if (typeof data !== 'string') {
-        throw new Error('Non-string data not yet supported')
-      }
-      const message = JSON.parse(data)
-      this.props.onMessageReceived(message)
-    })
-  }
-
-  private createPrimusSocket() {
-    if (!('Primus' in window)) {
-      throw new Error('Primus not available.')
     }
 
-    this.socket = Primus.connect({
-      reconnect: {
-        strategy: ['disconnect', 'online'], // XXX why?
-        max: 20000,
-        min: 1000,
-        retries: 50
-      },
-      timeout: 20000 // XXX weird stuff happens when too low and timeout happens
-    })
-
-    this.socket.OPEN = Primus.OPEN
-    this.socket.CLOSED = Primus.CLOSED
-    this.socket.CLOSING = Primus.CLOSING
-    this.socket.OPENING = Primus.OPENING
-    this.socket.sendJSON = this.socket.write
-    this.socket.close = this.socket.end
-    this.socket.on('error', (err: any) => {
-      debug('primus error code ' + err.code, err)
-      if (err.code === 1002) { // cannot connect to server
-        // XXX change connection state?
-        // XXX dispatch action
-        // XXX try retrieving rest resource to ascertain reason
-      }
-    })
-    this.socket.on('incoming::open', () => {
-      this.props.stateChanged('connected')
-    })
-    this.socket.on('close', () => {
+    this.socket.onclose = () => {
       this.props.stateChanged('disconnected')
-    })
-    this.socket.on('data', (data: any) => {
-      this.props.onMessageReceived(data)
-    })
+    }
+
+    this.socket.onmessage = ({ data }: MessageEvent) => {
+      this.props.onMessageReceived(this.decode(data))
+    }
   }
 }
 
