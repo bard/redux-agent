@@ -1,3 +1,4 @@
+import { createStandardAction, getType } from 'typesafe-actions'
 import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
@@ -193,6 +194,18 @@ const createSocketAgent = ({
 
   /// actions
 
+  const actions = {
+    connectionStateChanged: createStandardAction(
+      `${actionPrefix}CONNECTION_STATE_CHANGED`
+    )<SocketConnectionState>(),
+
+    messageSent: createStandardAction(
+      `${actionPrefix}MESSAGE_SENT`
+    )<number>()
+  }
+
+  /// connected component
+
   const mapStateToProps = (state: any): StateProps => ({
     lastMessageId: getStateSlice(state).lastMessageId,
     outbox: getStateSlice(state).outbox,
@@ -201,17 +214,11 @@ const createSocketAgent = ({
 
   const mapDispatchToProps = (dispatch: any): DispatchProps => ({
     stateChanged(newConnectionState: SocketConnectionState) {
-      dispatch({
-        type: actionPrefix + 'STATE_CHANGED',
-        payload: newConnectionState
-      })
+      dispatch(actions.connectionStateChanged(newConnectionState))
     },
 
     messageSent(id: number) {
-      dispatch({
-        type: actionPrefix + 'MESSAGE_SENT',
-        payload: id
-      })
+      dispatch(actions.messageSent(id))
     }
   })
 
@@ -233,7 +240,7 @@ const createSocketAgent = ({
     }
 
     switch (action.type) {
-      case actionPrefix + 'MESSAGE_SENT':
+      case getType(actions.messageSent):
         const stateSlice = getStateSlice(draft)
         const index = findIndex(
           stateSlice.outbox,
@@ -243,7 +250,7 @@ const createSocketAgent = ({
         stateSlice.outbox.splice(index, 1)
         break
 
-      case actionPrefix + 'STATE_CHANGE':
+      case getType(actions.connectionStateChanged):
         getStateSlice(draft).currentState = action.payload
         break
     }
@@ -270,7 +277,10 @@ const createSocketAgent = ({
     reducer,
     addToOutbox,
     scheduleConnect,
-    scheduleDisconnect
+    scheduleDisconnect,
+    actions: {
+      connectionStateChanged: actions.connectionStateChanged
+    }
   }
 }
 
