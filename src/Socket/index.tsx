@@ -17,6 +17,7 @@ const debug = createDebug('agent:Socket')
 interface OwnProps {
   connectionUrl: string
   onMessageReceived(data: SocketMessage): void
+  onConnectionStateChanged?(newState: SocketConnectionState): void
 }
 
 interface StateProps {
@@ -26,7 +27,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  stateChanged(newConnectionState: SocketConnectionState): void
+  connectionStateChanged(newConnectionState: SocketConnectionState): void
   messageSent(id: number): void
 }
 
@@ -173,11 +174,17 @@ class Socket extends React.Component<Props, {}> {
     this.socket = this.props.socketFactory(this.props.connectionUrl)
 
     this.socket.onopen = () => {
-      this.props.stateChanged('connected')
+      this.props.connectionStateChanged('connected')
+      if (this.props.onConnectionStateChanged) {
+        this.props.onConnectionStateChanged('connected')
+      }
     }
 
     this.socket.onclose = () => {
-      this.props.stateChanged('disconnected')
+      this.props.connectionStateChanged('disconnected')
+      if (this.props.onConnectionStateChanged) {
+        this.props.onConnectionStateChanged('disconnected')
+      }
     }
 
     this.socket.onmessage = ({ data }: MessageEvent) => {
@@ -213,7 +220,7 @@ const createSocketAgent = ({
   })
 
   const mapDispatchToProps = (dispatch: any): DispatchProps => ({
-    stateChanged(newConnectionState: SocketConnectionState) {
+    connectionStateChanged(newConnectionState: SocketConnectionState) {
       dispatch(actions.connectionStateChanged(newConnectionState))
     },
 
@@ -277,10 +284,7 @@ const createSocketAgent = ({
     reducer,
     addToOutbox,
     scheduleConnect,
-    scheduleDisconnect,
-    actions: {
-      connectionStateChanged: actions.connectionStateChanged
-    }
+    scheduleDisconnect
   }
 }
 
