@@ -1,5 +1,5 @@
 import createDebug from 'debug'
-import { createAction, ActionType, getType } from 'typesafe-actions'
+import { createStandardAction, ActionType, getType } from 'typesafe-actions'
 import { Dispatch } from 'redux'
 import React from 'react'
 import { connect } from 'react-redux'
@@ -7,9 +7,10 @@ import { withImmer, Fragment, findIndex } from '../util'
 import FetchHttpRequest from './FetchHttpRequest'
 import {
   StateSlice,
-  TrackedHttpRequest,
-  TrackedRequestState,
-  TrackedRequestEffects
+  HttpTask,
+  HttpTaskState,
+  HttpTaskOpts,
+  HttpTaskParams
 } from './types'
 
 const debug = createDebug('agent:Http')
@@ -19,8 +20,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  requestFinished(request: TrackedHttpRequest,
-    state: TrackedRequestState,
+  taskFinished(request: HttpTask,
+    state: HttpTaskState,
     result: any): void
 }
 
@@ -39,12 +40,12 @@ class Http extends React.Component<Props, {}> {
       return null
     }
 
-    const requests = this.props.tasks.map((request) =>
-      <FetchHttpRequest id={request.id}
-        key={request.id}
-        params={request.params}
+    const requests = this.props.tasks.map((task) =>
+      <FetchHttpRequest id={task.id}
+        key={task.id}
+        params={task.params}
         onStateChange={(requestState, result) =>
-          this.props.requestFinished(request, requestState, result)}
+          this.props.taskFinished(task, requestState, result)}
       />
     )
 
@@ -55,34 +56,34 @@ class Http extends React.Component<Props, {}> {
 const createHttpAgent = ({
   actionPrefix = 'HTTP_', stateKey = 'http'
 } = {}) => {
+
+  // STATE
+
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
 
-  /// actions
+  // ACTIONS
 
   const actions = {
-    requestFinished: createAction(`${actionPrefix}REQUEST_FINISHED`)
+    taskFinished: createStandardAction(`${actionPrefix}TASK_FINISHED`)<number>()
   }
 
-  /// connected component
+  // CONNECTED COMPONENT
 
   const mapStateToProps = (state: any): StateProps => ({
-    tasks: getStateSlice(state).outbox
+    tasks: getStateSlice(state).tasks
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): DispatchProps => ({
-    requestFinished(request: TrackedHttpRequest, state, result) {
-      dispatch({
-        type: actionPrefix + 'REQUEST_FINISHED',
-        payload: request.id
-      })
+    taskFinished(task: HttpTask, state, result) {
+      dispatch(actions.taskFinished(task.id))
 
       dispatch({
         type: (state === 'success'
-          ? request.effect.success
-          : request.effect.failure),
+          ? task.opts.success
+          : task.opts.failure),
         meta: {
-          requestId: request.id,
-          requestParams: request.params
+          taskId: task.id,
+          taskParams: task.params
         },
         payload: result
       })
@@ -94,55 +95,54 @@ const createHttpAgent = ({
     mapDispatchToProps
   )(Http)
 
-  /// reducer
+  // REDUCER
 
   const reducer = (state: any, action: any) => withImmer(state, (draft: any) => {
     if (draft && !(stateKey in draft)) {
       draft[stateKey] = {
-        lastRequestId: 0,
-        outbox: []
+        lastTaskId: 0,
+        tasks: []
       }
     }
 
     switch (action.type) {
-      case getType(actions.requestFinished):
+      case getType(actions.taskFinished):
         const stateSlice = getStateSlice(draft)
-        const index = findIndex(stateSlice.outbox,
-          (r: TrackedHttpRequest) => r.id === action.payload)
+        const index = findIndex(stateSlice.tasks,
+          (r: HttpTask) => r.id === action.payload)
 
-        stateSlice.outbox.splice(index, 1)
+        stateSlice.tasks.splice(index, 1)
         break
     }
   })
 
-  /// sub-reducers
+  // SUB-REDUCERS
 
   const addTask = (
     state: any,
-    params: any,
-    effect: TrackedRequestEffects
+    params: HttpTaskParams,
+    opts: HttpTaskOpts
   ) => withImmer(state, (draft: any) => {
     const stateSlice = getStateSlice(draft)
-    stateSlice.lastRequestId += 1
-    stateSlice.outbox.push({
-      id: stateSlice.lastRequestId,
-      effect,
+    stateSlice.lastTaskId += 1
+    stateSlice.tasks.push({
+      id: stateSlice.lastTaskId,
+      opts,
       params,
-      requestState: 'queued',
+      state: 'queued',
       data: null,
       error: null
     })
   })
 
-  /// selectors
+  // SELECTORS
 
-  /// exports
+  // INTERFACE
 
   return {
     Component,
     reducer,
-    addTask,
-    addToOutbox: addTask
+    addTask
   }
 }
 

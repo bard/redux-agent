@@ -1,22 +1,24 @@
 import { JSONObject } from '../types'
 
-export type TrackedRequestState = 'queued' | 'pending' | 'success' | 'failure'
+export type HttpTaskState = 'queued' | 'pending' | 'success' | 'failure'
 
-export interface TrackedRequestEffects {
+export interface HttpTaskOpts {
   success: string
   failure: string
 }
 
-export interface TrackedHttpRequest {
+export type HttpTaskParams = RequestInit & { url: RequestInfo }
+
+export interface HttpTask {
   id: number
-  requestState: TrackedRequestState
-  effect: TrackedRequestEffects
-  params: RequestInit & { url: RequestInfo }
+  opts: HttpTaskOpts
+  state: HttpTaskState
+  params: HttpTaskParams
   data: null | JSONObject
   error: any // XXX specify better
 }
 
 export interface StateSlice {
-  outbox: TrackedHttpRequest[]
-  lastRequestId: number
+  tasks: HttpTask[]
+  lastTaskId: number
 }

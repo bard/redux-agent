@@ -1,13 +1,13 @@
 import createDebug from 'debug'
 import { Component } from 'react'
-import { TrackedRequestState } from './types'
+import { HttpTaskState } from './types'
 
 const debug = createDebug('agent:FetchHttpRequest')
 
 interface Props {
   id: number
   params: RequestInit & { url: RequestInfo }
-  onStateChange: (state: TrackedRequestState, dataOrError: any) => void
+  onStateChange: (state: HttpTaskState, dataOrError: any) => void
 }
 
 class HttpRequest extends Component<Props, any> {
