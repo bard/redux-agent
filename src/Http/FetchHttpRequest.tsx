@@ -25,14 +25,26 @@ class HttpRequest extends Component<Props, any> {
 
     const { url, ...params } = this.props.params
 
-    const response = await fetch(url, {
-      headers: {
-        Accept: 'application/json',
-        ...params.headers,
-      },
-      credentials: 'same-origin',
-      ...params
-    })
+    const headers = new Headers(params.headers)
+    if (!headers.has('accept')) {
+      headers.append('accept', 'application/json')
+    }
+
+    let body
+    if (params.body &&
+      Object.prototype.toString.call(params.body) === '[object Object]') {
+      headers.append('content-type', 'application/json')
+      body = JSON.stringify(params.body)
+    }
+
+    const processedParams = {
+      credentials: 'same-origin' as RequestCredentials,
+      ...params,
+      body,
+      headers
+    }
+
+    const response = await fetch(url, processedParams)
 
     if (response.ok) {
       const contentType = response.headers.get('content-type')
