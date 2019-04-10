@@ -7,18 +7,16 @@ import { Fragment, withImmer, findIndex } from '../util'
 import {
   SocketConnectionState,
   TrackedSocketMessage,
-  SocketMessage,
-  SocketState
+  MinimalWebSocket,
+  SocketState,
+  SocketAgentComponentDefaultProps,
+  SocketAgentComponentOwnProps,
+  SocketAgentFactoryArgs,
+  SocketAgentFactoryResult
 } from './types'
 import OutgoingSocketMessage from './OutgoingSocketMessage'
 
 const debug = createDebug('agent:Socket')
-
-interface OwnProps {
-  connectionUrl: string
-  onMessageReceived(data: SocketMessage): void
-  onConnectionStateChanged?(newState: SocketConnectionState): void
-}
 
 interface StateProps {
   lastMessageId: number // XXX mark as readonly
@@ -31,23 +29,18 @@ interface DispatchProps {
   messageSent(id: number): void
 }
 
-interface DefaultProps {
-  socketFactory: (connectionUrl: string) => MinimalWebSocket
-  wireFormat: null | 'json'
-}
-
-export type MinimalWebSocket = Pick<WebSocket,
-  'OPEN' | 'CONNECTING' | 'CLOSING' | 'onopen' | 'onclose' |
-  'onmessage' | 'close' | 'send'
->
-
-type Props = OwnProps & StateProps & DispatchProps & DefaultProps
+type Props = SocketAgentComponentOwnProps &
+  SocketAgentComponentDefaultProps &
+  StateProps &
+  DispatchProps
 
 class Socket extends React.Component<Props, {}> {
-  static defaultProps: DefaultProps = {
-    socketFactory: (connectionUrl: string): MinimalWebSocket =>
+  static defaultProps: SocketAgentComponentDefaultProps = {
+    socketFactory: (connectionUrl) => {
+      // XXX check at runtime for connectionUrl
       // @ts-ignore
-      new ReconnectingWebSocket(connectionUrl),
+      return new ReconnectingWebSocket(connectionUrl) as MinimalWebSocket
+    },
     wireFormat: 'json'
   }
 
@@ -171,7 +164,7 @@ class Socket extends React.Component<Props, {}> {
   }
 
   private createSocket() {
-    this.socket = this.props.socketFactory(this.props.connectionUrl)
+    this.socket = this.props.socketFactory!(this.props.connectionUrl)
 
     this.socket.onopen = () => {
       this.props.connectionStateChanged('connected')
@@ -193,10 +186,18 @@ class Socket extends React.Component<Props, {}> {
   }
 }
 
-const createSocketAgent = ({
-  stateKey = 'socket',
-  actionPrefix = 'SOCKET_'
-} = {}) => {
+const createSocketAgent = (
+  factoryArgs?: SocketAgentFactoryArgs
+): SocketAgentFactoryResult => {
+
+  const actionPrefix = factoryArgs
+    ? factoryArgs.actionPrefix || 'SOCKET_'
+    : 'SOCKET_'
+
+  const stateKey = factoryArgs
+    ? factoryArgs.stateKey || 'socket'
+    : 'socket'
+
   const getStateSlice = (state: any): SocketState => (state[stateKey] || {})
 
   /// actions
@@ -289,3 +290,4 @@ const createSocketAgent = ({
 }
 
 export default createSocketAgent
+export { MinimalWebSocket }
