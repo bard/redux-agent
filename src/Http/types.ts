@@ -1,4 +1,4 @@
-import { JSONObject } from '../types'
+import { JSONObject, Omit } from '../types'
 
 export type HttpTaskState = 'queued' | 'pending' | 'success' | 'failure'
 
@@ -7,7 +7,10 @@ export interface HttpTaskOpts {
   failure: string
 }
 
-export type HttpTaskParams = RequestInit & { url: RequestInfo }
+export type HttpTaskParams =
+  { url: RequestInfo } &
+  Omit<RequestInit, 'body'> &
+  { body?: BodyInit | JSONObject }
 
 export interface HttpTask {
   id: number
