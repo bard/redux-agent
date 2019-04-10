@@ -10,7 +10,9 @@ import {
   HttpTask,
   HttpTaskState,
   HttpTaskOpts,
-  HttpTaskParams
+  HttpTaskParams,
+  HttpAgentFactoryArgs,
+  HttpAgentFactoryResult
 } from './types'
 
 const debug = createDebug('agent:Http')
@@ -53,9 +55,17 @@ class Http extends React.Component<Props, {}> {
   }
 }
 
-const createHttpAgent = ({
-  actionPrefix = 'HTTP_', stateKey = 'http'
-} = {}) => {
+const createHttpAgent = (
+  factoryArgs?: HttpAgentFactoryArgs
+): HttpAgentFactoryResult => {
+
+  const actionPrefix = factoryArgs
+    ? factoryArgs.actionPrefix || 'HTTP_'
+    : 'HTTP_'
+
+  const stateKey = factoryArgs
+    ? factoryArgs.stateKey || 'http'
+    : 'http'
 
   // STATE
 
