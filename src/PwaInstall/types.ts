@@ -31,3 +31,26 @@ export interface BeforeInstallPromptEvent extends Event {
    */
   prompt(): Promise<void>
 }
+
+export type PwaInstallState = 'unknown'
+  | 'not-installable'
+  | 'installable'
+  | 'installing'
+  | 'installed'
+
+export type PwaInstallTask = 'install'
+
+export interface PwaInstallAgentFactoryArgs {
+  actionPrefix: string
+  stateKey: string
+}
+
+export interface PwaInstallAgentFactoryResult {
+  Component: React.ComponentClass
+  reducer: <AppState>(state: AppState, action: any) => AppState
+  addToTasks: <AppState>(
+    state: AppState,
+    task: PwaInstallTask) => AppState
+  getInstallable: (state: any) => boolean
+  getInstalled: (state: any) => boolean
+}

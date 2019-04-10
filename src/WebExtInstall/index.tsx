@@ -5,6 +5,12 @@ import React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { sendChromeMessage } from './util'
+import {
+  WebExtInstallState,
+  WebExtInstallTask,
+  WebExtInstallAgentFactoryArgs,
+  WebExtInstallAgentFactoryResult
+} from './types'
 
 const debug = createDebug('agent:WebExtInstall')
 
@@ -17,7 +23,7 @@ interface OwnProps {
 
 interface StateProps {
   installDesired: boolean
-  installState: InstallState
+  installState: WebExtInstallState
 }
 
 interface DispatchProps {
@@ -133,21 +139,24 @@ class WebExtInstall extends React.Component<Props, {}> {
 }
 
 interface StateSlice {
-  installState: InstallState
+  installState: WebExtInstallState
   installDesired: boolean
 }
 
-type InstallState = 'unknown'
-  | 'not-installable'
-  | 'installable'
-  | 'installing'
-  | 'installed'
+const createWebExtInstallAgent = (
+  factoryArgs?: WebExtInstallAgentFactoryArgs
+): WebExtInstallAgentFactoryResult => {
 
-type Task = 'install'
+  const actionPrefix = factoryArgs
+    ? factoryArgs.actionPrefix || 'WEBEXT_'
+    : 'WEBEXT_'
 
-const createWebExtInstallAgent = ({
-  actionPrefix = 'WEB_EXT_', stateKey = 'webExt'
-} = {}) => {
+  const stateKey = factoryArgs
+    ? factoryArgs.stateKey || 'webExt'
+    : 'webExt'
+
+  /// state
+
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
 
   /// actions
@@ -215,7 +224,7 @@ const createWebExtInstallAgent = ({
 
   const addToTasks = <S extends any>(
     state: S,
-    task: Task
+    task: WebExtInstallTask
   ): S => withImmer(state, (draft: S) => {
     switch (task) {
       case 'install':
@@ -244,8 +253,7 @@ const createWebExtInstallAgent = ({
     addToTasks,
     getStatus,
     getInstallable,
-    getInstalled,
-    actions
+    getInstalled
   }
 }
 

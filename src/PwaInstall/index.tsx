@@ -4,7 +4,13 @@ import { createAction, ActionType, getType } from 'typesafe-actions'
 import React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { BeforeInstallPromptEvent } from './types'
+import {
+  BeforeInstallPromptEvent,
+  PwaInstallTask,
+  PwaInstallState,
+  PwaInstallAgentFactoryArgs,
+  PwaInstallAgentFactoryResult
+} from './types'
 
 declare global {
   interface Navigator {
@@ -131,21 +137,24 @@ class PwaInstall extends React.Component<Props, {}> {
 }
 
 interface StateSlice {
-  installState: InstallState
+  installState: PwaInstallState
   installDesired: boolean
 }
 
-type InstallState = 'unknown'
-  | 'not-installable'
-  | 'installable'
-  | 'installing'
-  | 'installed'
+const createPwaInstallAgent = (
+  factoryArgs?: PwaInstallAgentFactoryArgs
+): PwaInstallAgentFactoryResult => {
 
-type Task = 'install'
+  const actionPrefix = factoryArgs
+    ? factoryArgs.actionPrefix || 'PWA_'
+    : 'PWA_'
 
-const createPwaInstallAgent = ({
-  actionPrefix = 'PWA_', stateKey = 'pwa'
-} = {}) => {
+  const stateKey = factoryArgs
+    ? factoryArgs.stateKey || 'pwa'
+    : 'pwa'
+
+  /// state
+
   const getStateSlice = (state: any): StateSlice => (state[stateKey] || {})
 
   /// actions
@@ -221,7 +230,7 @@ const createPwaInstallAgent = ({
     : produce(state, worker)
 
   const addToTasks = <S extends {}>(
-    state: S, task: Task
+    state: S, task: PwaInstallTask
   ): S => withImmer(state, (draft: S) => {
     switch (task) {
       case 'install':
@@ -245,8 +254,7 @@ const createPwaInstallAgent = ({
     reducer,
     addToTasks,
     getInstallable,
-    getInstalled,
-    actions
+    getInstalled
   }
 }
 
