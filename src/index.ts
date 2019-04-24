@@ -1,4 +1,3 @@
-export { default as composeReducers } from 'reduce-reducers'
 export { default as reduceReducers } from 'reduce-reducers'
 export { default as HashLocation } from './HashLocation'
 export { default as Route } from './Route'
