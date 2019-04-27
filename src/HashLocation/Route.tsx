@@ -1,9 +1,11 @@
+import React from 'react'
+
 interface Props {
   pattern: string
-  onMatch(params: any): void
+  onMatch(params: object): void
 }
 
-const Route = (_: Props) => (
+const Route: React.FunctionComponent<Props> = (_props) => (
   null
 )
 
