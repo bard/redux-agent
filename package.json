@@ -14,8 +14,7 @@
   "dependencies": {
     "path-parser": "^4.2.0",
     "reconnecting-websocket": "^4.1.10",
-    "reduce-reducers": "^1.0.1",
-    "rimraf": "^2.6.3"
+    "reduce-reducers": "^1.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
@@ -34,6 +33,7 @@
     "react": "^16.8.6",
     "redux": "^4.0.1",
     "release-it": "^10.4.4",
+    "rimraf": "^2.6.3",
     "rollup": "^1.4.1",
     "rollup-plugin-commonjs": "^9.2.1",
     "rollup-plugin-json": "^3.1.0",
@@ -55,7 +55,6 @@
     "lint": "tslint --project . && tsfmt --verify -r",
     "compilecheck": "tsc --noEmit --pretty false",
     "visualize": "source-map-explorer --html dist/redux-agent.esm.js dist/redux-agent.esm.js.map > source.html",
-    "postinstall": "rimraf node_modules/@types/node && echo 'workaround for libs importing @types/node on browser environment'",
     "release": "release-it"
   },
   "peerDependencies": {

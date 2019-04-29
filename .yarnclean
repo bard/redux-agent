@@ -1,0 +1,3 @@
+@types/node
+@types/glob
+@types/resolve
