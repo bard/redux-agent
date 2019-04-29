@@ -46,25 +46,18 @@ class Socket extends React.Component<Props, {}> {
 
   private socket: any = null
 
-  private hotReloading: boolean = false
-
   constructor(props: Props) {
     super(props)
     debug('constructor')
-    this.setupHMR()
   }
 
   componentDidMount() {
     debug('componentDidMount')
     this.updateConnectionState()
-    this.hotReloading = false
   }
 
   componentWillUnmount() {
     debug('componentWillUnmount')
-    if (!this.hotReloading) {
-      this.socket.close()
-    }
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -112,33 +105,6 @@ class Socket extends React.Component<Props, {}> {
       return JSON.parse(data)
     } else {
       return data
-    }
-  }
-
-  private setupHMR() {
-    if (module.hot) {
-      const globalScope = window as any
-      debug('adding handlers to persist socket state across hot reloads')
-      if (module.hot.accept.length === 1) {
-        // It's Parcel
-        const hmrSaveId = '__HMR_SAVE_SOCKET'
-        module.hot.dispose(() => {
-          debug('saving socket before hot reload')
-          globalScope[hmrSaveId] = this.socket
-          this.hotReloading = true
-        })
-
-        if (globalScope[hmrSaveId]) {
-          debug('restoring socket after hot reload')
-          this.hotReloading = true
-          this.socket = globalScope[hmrSaveId]
-          delete globalScope[hmrSaveId]
-        }
-      } else if (module.hot.accept.length === 2) {
-        // It's WebPack
-        // tslint:disable-next-line
-        console.warn('WebPack HMR currently not supported.')
-      }
     }
   }
 
