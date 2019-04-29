@@ -71,5 +71,8 @@
       "pre-push": "yarn typecheck && yarn lint",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
