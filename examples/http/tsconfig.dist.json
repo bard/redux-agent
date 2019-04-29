@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
+    "jsx": "preserve",
+    "outDir": "src-js",
+    "baseUrl": ".",
+    "paths": {
+      "redux-agent": ["../.."]
+    }
+  }
+}

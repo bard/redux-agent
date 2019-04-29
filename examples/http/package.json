@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "start-ts": "parcel index-ts.html",
+    "start-js": "parcel index-js.html",
+    "dist": "tsc -p tsconfig.dist.json"
+  },
+  "dependencies": {
+    "react": "^16.0.0",
+    "react-dom": "^16.8.5",
+    "react-redux": "^6.0.1",
+    "redux": "^4.0.1",
+    "redux-agent": "https://github.com/bard/redux-agent"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.4.5"
+  }
+}

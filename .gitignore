@@ -5,3 +5,6 @@ yarn-debug.log*
 yarn-error.log*
 /project.org
 /.rpt2_cache
+/examples/*/yarn.lock
+/examples/*/dist
+.cache/
