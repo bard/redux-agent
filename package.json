@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "redux-agent",
   "version": "0.1.0",
   "main": "dist/redux-agent.cjs.js",
