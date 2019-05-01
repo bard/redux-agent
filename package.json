@@ -1,6 +1,6 @@
 {
   "name": "redux-agent",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "dist/redux-agent.cjs.js",
   "module": "dist/redux-agent.esm.js",
   "browser": "dist/redux-agent.umd.js",
