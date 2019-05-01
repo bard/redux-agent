@@ -18,7 +18,7 @@ import {
 const debug = createDebug('agent:Http')
 
 interface StateProps {
-  tasks: any[]
+  tasks: HttpTask[]
 }
 
 interface DispatchProps {
