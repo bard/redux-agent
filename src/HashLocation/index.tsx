@@ -1,13 +1,18 @@
 import React from 'react'
-import Path from 'path-parser'
+import pathToRegexp from 'path-to-regexp'
 import createDebug from 'debug'
-import Route from './Route'
+import Route, { RouteMatch } from './Route'
 
 const debug = createDebug('agent:HashLocation')
 
 interface Props {
   location: string
   enabled: boolean
+  onRouteMatch(match: RouteMatch): void
+}
+
+interface StringMap {
+  [key: string]: string
 }
 
 type RouteElement = React.ReactElement<React.ComponentProps<typeof Route>>
@@ -43,7 +48,7 @@ class HashLocation extends React.Component<Props, {}> {
     }
 
     if (prevProps.location !== this.props.location) {
-      this.updateBrowserLocation()
+      this.setLocationFromProps()
     }
   }
 
@@ -52,9 +57,10 @@ class HashLocation extends React.Component<Props, {}> {
   }
 
   private enable() {
+    debug('enable')
     if (!window.location.hash) {
       // No initial route, initialize from state
-      this.updateBrowserLocation()
+      this.setLocationFromProps()
     } else {
       // Location present, we want to go back to the state expressed by it,
       // so simulate a location change.
@@ -62,15 +68,15 @@ class HashLocation extends React.Component<Props, {}> {
     }
   }
 
-  private updateBrowserLocation() {
+  private setLocationFromProps() {
     debug('updateBrowserLocation')
 
     const newLocation = '#' + this.props.location
 
     if (!this.props.enabled) {
-      // We usually want the agent to be disabled while application is
+      // We usually want routing to be disabled while application is
       // being initialized, so as to avoid a flurry of updates to the
-      // browser location while state changes.
+      // browser address bar while state changes.
 
       debug('agent disabled, skipping update')
       return
@@ -86,8 +92,8 @@ class HashLocation extends React.Component<Props, {}> {
       // - router matches on /widget/:id route
       // - router dispatches { type: 'LOAD_WIDGET', payload: 1 }
       // - application reducer updates state to { currentWidget: 1 }
-      // - HashLocation agent "renders" the state to the #/widget/1 location
-      // - location is already #/widget/1 resulting in no-op
+      // - HashLocation agent "renders" the new state by setting location to #/widget/1
+      // - location is already #/widget/1, resulting in no-op
 
       debug(`location already at ${newLocation}, skipping update`)
       return
@@ -102,18 +108,18 @@ class HashLocation extends React.Component<Props, {}> {
     // - router dispatches { type: 'LOAD_WIDGET', payload: 1 }
     // - application reducer updates state to { currentWidget: 1 }
     // - HashLocation agent "renders" the state to the #/widget/1 location
-    // - location listener is paused because this is not a user navigation action
+    // - location listener is paused because this was not a user action
     // - location is updated
     // - location listener is resumed to detect navigation action
 
     debug(`setting location to ${newLocation}`)
     this.withoutGeneratingNavigationActions(() => {
-      window.location.hash = '#' + this.props.location
+      window.location.hash = newLocation
     })
   }
 
   private browserLocationDidChange() {
-    debug('locationDidChange')
+    debug('browserLocationDidChange')
 
     if (!this.props.enabled) {
       debug('navigation disabled, skipping')
@@ -127,9 +133,15 @@ class HashLocation extends React.Component<Props, {}> {
 
     const browserLocation = window.location.hash.substring(1) || '/'
 
-    const matchingRoute = this.matchRoute(browserLocation)
+    debug('location:', browserLocation)
+    const matchingRoute = this.findMatchingRoute(browserLocation)
     if (matchingRoute) {
-      matchingRoute.onMatch(matchingRoute.params)
+      const { name, params } = matchingRoute
+      debug(`matched route "${name}", invoking handler`)
+      this.props.onRouteMatch({ name, params })
+    } else {
+      debug('no roture matched, resetting location')
+      this.setLocationFromProps()
     }
   }
 
@@ -141,16 +153,40 @@ class HashLocation extends React.Component<Props, {}> {
     window.setTimeout(() => { this.locationListenerPaused = false }, 0)
   }
 
-  private matchRoute(browserLocation: string) {
+  private findMatchingRoute(browserLocation: string) {
     const routes = React.Children.toArray(this.props.children) as RouteElement[]
 
     for (const route of routes) {
-      const { props: { pattern, onMatch } } = route
-      const params = new Path(pattern).test(browserLocation)
+      const { props: { name, pattern } } = route
+      const params = matchRoute(browserLocation, pattern)
       if (params) {
-        return { pattern, params, onMatch }
+        return { name, pattern, params }
       }
     }
+    return null
+  }
+}
+
+const hasOwnProperty = Object.prototype.hasOwnProperty
+
+const matchRoute = (path: string, pattern: string): StringMap | null => {
+  const keys = [] as pathToRegexp.Key[]
+  const params = {} as StringMap
+  const regexp = pathToRegexp(pattern, keys)
+  const match = regexp.exec(path)
+  if (match) {
+    // From express
+    for (let i = 1; i < match.length; i++) {
+      const key = keys[i - 1]
+      const prop = key.name
+      const val = decodeURIComponent(match[i])
+
+      if (val !== undefined || !(hasOwnProperty.call(params, prop))) {
+        params[prop] = val
+      }
+    }
+    return params
+  } else {
     return null
   }
 }

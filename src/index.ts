@@ -1,6 +1,6 @@
 export { default as reduceReducers } from 'reduce-reducers'
 export { default as HashLocation } from './HashLocation'
-export { default as Route } from './HashLocation/Route'
+export { default as Route, RouteMatch } from './HashLocation/Route'
 export { default as DocumentTitle } from './DocumentTitle'
 export { default as createRequestResponseAgent } from './RequestResponse'
 export { default as createHttpAgent } from './Http/index'

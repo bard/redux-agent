@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { HashLocation, Route } from 'redux-agent'
+import { HashLocation, Route, RouteMatch } from 'redux-agent'
 import { State } from '../types'
 
 interface StateProps {
@@ -9,31 +9,41 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  navigatedToItem(params: any): void
+  route(match: RouteMatch): void
 }
 
 type Props = StateProps & DispatchProps
 
 const Router: React.FunctionComponent<Props> = (
-  { location, navigatedToItem }
+  { location, route }
 ) => (
-    <HashLocation enabled={true} location={location}>
-      <Route pattern='/item/:index' onMatch={navigatedToItem} />
+    <HashLocation enabled={true} location={location} onRouteMatch={route}>
+      <Route name='item' pattern='/item/:index' />
     </HashLocation>
   )
 
 const mapStateToProps = (state: State): StateProps => ({
-  location: '/item/' + state.current
+  location: mapStateToLocation(state)
 })
 
+const mapStateToLocation = (state: State): string => {
+  return '/item/' + state.current
+}
+
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
-  navigatedToItem(params) {
-    dispatch({
-      type: 'GOTO_ITEM',
-      payload: params.index
-    })
+  route(match) {
+    dispatch(mapLocationToAction(match))
   }
 })
+
+const mapLocationToAction = ({ name, params }: RouteMatch) => {
+  switch (name) {
+    case 'item':
+      return { type: 'GOTO_ITEM', payload: params.index }
+    default:
+      throw new Error('Invalid route')
+  }
+}
 
 export default connect(
   mapStateToProps,

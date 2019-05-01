@@ -1,8 +1,13 @@
 import React from 'react'
 
+export interface RouteMatch {
+  name: string
+  params: { [key: string]: string }
+}
+
 interface Props {
+  name: string
   pattern: string
-  onMatch(params: object): void
 }
 
 const Route: React.FunctionComponent<Props> = (_props) => (

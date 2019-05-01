@@ -21,7 +21,7 @@
     "src"
   ],
   "dependencies": {
-    "path-parser": "^4.2.0",
+    "path-to-regexp": "^3.0.0",
     "reconnecting-websocket": "^4.1.10",
     "reduce-reducers": "^1.0.1"
   },
