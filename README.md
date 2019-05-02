@@ -37,7 +37,7 @@ For an in-depth introduction, see the [introduction and tutorial](https://redux-
 ## Documentation
 
 - [Getting started](https://redux-agent.org/getting-started/)
-- [Introduction and tutorial](https://redux-agent.org/intro/reactive-effect-management-with-redux-agent/)
+- [Introduction and tutorial](https://redux-agent.org/guides/reactive-effect-management-with-redux-agent/)
 - [Status, limitations, differences from other approaches](https://redux-agent.org/status-and-limitations/)
 - [The HTTP Agent](https://redux-agent.org/guides/the-http-agent/): manage HTTP requests and responses using `window.fetch`
 - [Simplifying reducers with Immer](https://redux-agent.org/guides/simplifying-reducers-with-immer/)
