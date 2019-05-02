@@ -16,6 +16,16 @@
     "email": "hyperstruct@gmail.com",
     "url": "https://massimilianomirra.com"
   },
+  "description": "Drive non-visual effects (such as network I/O) the same way you drive visual (UI) effects: through changes to application state.",
+  "keywords": [
+    "redux",
+    "react",
+    "effects",
+    "side effects",
+    "async",
+    "action",
+    "middleware"
+  ],
   "files": [
     "dist",
     "src"
