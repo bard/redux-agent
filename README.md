@@ -1,6 +1,6 @@
 # redux-agent
 
-**Simple, reactive, middleware-free** effect management for React/Redux applications. Drive non-visual effects (such as network I/O) the same way you drive visual (UI) effects: through changes to application state. Simplify the architecture and consolidate application logic in the reducer.
+**Simple, reactive, middleware-free** effect management for React/Redux applications. Drive non-visual effects (such as network I/O) the same way you drive visual (UI) effects: through changes to application state.
 
 ## Example
 
