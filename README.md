@@ -40,8 +40,8 @@ For an in-depth introduction, see the [introduction and tutorial](https://redux-
 - [Introduction and tutorial](https://redux-agent.org/guides/reactive-effect-management-with-redux-agent/)
 - [Status, limitations, differences from other approaches](https://redux-agent.org/status-and-limitations/)
 - [The HTTP Agent](https://redux-agent.org/guides/the-http-agent/): manage HTTP requests and responses using `window.fetch`
+- [The WebSocket Agent](https://redux-agent.org/guides/the-websocket-agent/): manage WebSocket messaging
 - [Simplifying reducers with Immer](https://redux-agent.org/guides/simplifying-reducers-with-immer/)
-- (_under construction_) [The WebSocket Agent](https://redux-agent.org/guides/the-websocket-agent/): manage WebSocket messaging
 - (_under construction_) [The HashLocation Agent](https://redux-agent.org/guides/the-hash-location-agent/): manage hash-based routing
 - (_under construction_) [The PwaInstall Agent](https://redux-agent.org/guides/the-pwa-install-agent/): manage the install flow for Progressive Web Applications
 - (_under construction_) [The WebExtInstall Agent](https://redux-agent.org/guides/the-web-ext-install-agent/): manage the install flow for web browser extensions
