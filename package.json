@@ -16,7 +16,7 @@
     "email": "hyperstruct@gmail.com",
     "url": "https://massimilianomirra.com"
   },
-  "description": "Drive non-visual effects (such as network I/O) the same way you drive visual (UI) effects: through changes to application state.",
+  "description": "Reducer-driven effects and single source of logic for Redux+React applications.",
   "keywords": [
     "redux",
     "react",
