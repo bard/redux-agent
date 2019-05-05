@@ -33,7 +33,7 @@
   "dependencies": {
     "path-to-regexp": "^3.0.0",
     "reconnecting-websocket": "^4.1.10",
-    "reduce-reducers": "1.0.1"
+    "reduce-reducers": "^1.0.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
