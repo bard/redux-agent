@@ -17,8 +17,6 @@ export interface HttpTask {
   opts: HttpTaskOpts
   state: HttpTaskState
   params: HttpTaskParams
-  data: null | JSONObject
-  error: any // XXX specify better
 }
 
 export interface StateSlice {

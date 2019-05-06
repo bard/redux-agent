@@ -22,9 +22,11 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  taskFinished(request: HttpTask,
+  taskFinished(
+    request: HttpTask,
     state: HttpTaskState,
-    result: any): void
+    data: any,
+    meta: any): void
 }
 
 type Props = StateProps & DispatchProps
@@ -42,16 +44,16 @@ class Http extends React.Component<Props, {}> {
       return null
     }
 
-    const requests = this.props.tasks.map((task) =>
-      <FetchHttpRequest id={task.id}
-        key={task.id}
-        params={task.params}
-        onStateChange={(requestState, result) =>
-          this.props.taskFinished(task, requestState, result)}
-      />
-    )
-
-    return <Fragment>{requests}</Fragment>
+    return <Fragment>{
+      this.props.tasks.map((task) =>
+        <FetchHttpRequest
+          id={task.id}
+          key={task.id}
+          params={task.params}
+          onStateChange={(taskState, data, meta) =>
+            this.props.taskFinished(task, taskState, data, meta)} />
+      )
+    }</Fragment>
   }
 }
 
@@ -84,18 +86,17 @@ const createHttpAgent = (
   })
 
   const mapDispatchToProps = (dispatch: Dispatch<ActionType<typeof actions>>): DispatchProps => ({
-    taskFinished(task: HttpTask, state, result) {
+    taskFinished(task: HttpTask, state, data, meta) {
       dispatch(actions.taskFinished(task.id))
 
       dispatch({
-        type: (state === 'success'
-          ? task.opts.success
-          : task.opts.failure),
+        type: state === 'success' ? task.opts.success : task.opts.failure,
         meta: {
           taskId: task.id,
-          taskParams: task.params
+          taskParams: task.params,
+          ...meta
         },
-        payload: result
+        payload: data
       })
     }
   })
@@ -135,14 +136,13 @@ const createHttpAgent = (
   ) => withImmer(state, (draft: any) => {
     const stateSlice = getStateSlice(draft)
     stateSlice.lastTaskId += 1
-    stateSlice.tasks.push({
+    const task: HttpTask = {
       id: stateSlice.lastTaskId,
       opts,
       params,
-      state: 'queued',
-      data: null,
-      error: null
-    })
+      state: 'queued'
+    }
+    stateSlice.tasks.push(task)
   })
 
   // SELECTORS

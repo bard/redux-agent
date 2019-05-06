@@ -7,7 +7,7 @@ const debug = createDebug('agent:FetchHttpRequest')
 interface Props {
   id: number
   params: RequestInit & { url: RequestInfo }
-  onStateChange: (state: HttpTaskState, dataOrError: any) => void
+  onStateChange: (state: HttpTaskState, data: any, meta: any) => void
 }
 
 class HttpRequest extends Component<Props, any> {
@@ -46,19 +46,15 @@ class HttpRequest extends Component<Props, any> {
 
     const response = await fetch(url, processedParams)
 
-    if (response.ok) {
-      const contentType = response.headers.get('content-type')
-      if (contentType &&
-        contentType.indexOf('application/json') !== -1) {
-        const json = await response.json()
-        this.props.onStateChange('success', json)
-      } else {
-        const text = await response.text()
-        this.props.onStateChange('success', text)
-      }
-    } else {
-      this.props.onStateChange('failure', response.status)
-    }
+    const contentType = response.headers.get('content-type')
+    const data = (contentType &&
+      contentType.indexOf('application/json') !== -1)
+      ? await response.json()
+      : await response.text()
+
+    this.props.onStateChange(response.ok ? 'success' : 'failure', data, {
+      status: response.status
+    })
   }
 }
 
