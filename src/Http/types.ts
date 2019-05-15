@@ -10,7 +10,7 @@ export interface HttpTaskOpts {
 export type HttpTaskParams =
   { url: RequestInfo } &
   Omit<RequestInit, 'body'> &
-  { body?: BodyInit | JSONObject }
+  { body?: BodyInit | object }
 
 export interface HttpTask {
   id: number
