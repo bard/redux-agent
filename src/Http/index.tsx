@@ -12,7 +12,8 @@ import {
   HttpTaskOpts,
   HttpTaskParams,
   HttpAgentFactoryArgs,
-  HttpAgentFactoryResult
+  HttpAgentFactoryResult,
+  HttpAgentComponentOwnProps
 } from './types'
 
 const debug = createDebug('agent:Http')
@@ -29,7 +30,7 @@ interface DispatchProps {
     meta: any): void
 }
 
-type Props = StateProps & DispatchProps
+type Props = HttpAgentComponentOwnProps & StateProps & DispatchProps
 
 class Http extends React.Component<Props, {}> {
   componentDidMount() {
@@ -49,6 +50,7 @@ class Http extends React.Component<Props, {}> {
         <FetchHttpRequest
           id={task.id}
           key={task.id}
+          baseUrl={this.props.baseUrl || ''}
           params={task.params}
           onStateChange={(taskState, data, meta) =>
             this.props.taskFinished(task, taskState, data, meta)} />

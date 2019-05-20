@@ -6,6 +6,7 @@ const debug = createDebug('agent:FetchHttpRequest')
 
 interface Props {
   id: number
+  baseUrl: string
   params: RequestInit & { url: RequestInfo }
   onStateChange: (state: HttpTaskState, data: any, meta: any) => void
 }
@@ -44,7 +45,7 @@ class HttpRequest extends Component<Props, any> {
       headers
     }
 
-    const response = await fetch(url, processedParams)
+    const response = await fetch(this.props.baseUrl + url, processedParams)
 
     const contentType = response.headers.get('content-type')
     const data = (contentType &&

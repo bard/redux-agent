@@ -24,13 +24,19 @@ export interface StateSlice {
   lastTaskId: number
 }
 
+export interface HttpAgentComponentOwnProps {
+  baseUrl?: string
+}
+
 export interface HttpAgentFactoryArgs {
   actionPrefix: string
   stateKey: string
 }
 
 export interface HttpAgentFactoryResult {
-  Component: React.ComponentClass
+  Component: React.ComponentClass<
+    HttpAgentComponentOwnProps
+  >
   reducer: <AppState>(state: AppState, action: any) => AppState
   addTask: <AppState>(
     state: AppState,
