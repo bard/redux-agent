@@ -1,4 +1,4 @@
-import { JSONObject, Omit } from '../types'
+import { Omit } from '../types'
 
 export type HttpTaskState = 'queued' | 'pending' | 'success' | 'failure'
 
