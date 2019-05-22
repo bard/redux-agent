@@ -79,7 +79,7 @@
   "peerDependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-redux": "^6",
+    "react-redux": "^7",
     "redux": "^4.0.1"
   },
   "engines": {
