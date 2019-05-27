@@ -45,17 +45,24 @@ class HttpRequest extends Component<Props, any> {
       headers
     }
 
-    const response = await fetch(this.props.baseUrl + url, processedParams)
+    try {
+      const response = await fetch(this.props.baseUrl + url, processedParams)
 
-    const contentType = response.headers.get('content-type')
-    const data = (contentType &&
-      contentType.indexOf('application/json') !== -1)
-      ? await response.json()
-      : await response.text()
+      const contentType = response.headers.get('content-type')
+      const data = (contentType &&
+        contentType.indexOf('application/json') !== -1)
+        ? await response.json()
+        : await response.text()
 
-    this.props.onStateChange(response.ok ? 'success' : 'failure', data, {
-      status: response.status
-    })
+      this.props.onStateChange(response.ok ? 'success' : 'failure', data, {
+        status: response.status
+      })
+    } catch (err) {
+      this.props.onStateChange('failure', null, {
+        status: 0,
+        err
+      })
+    }
   }
 }
 
