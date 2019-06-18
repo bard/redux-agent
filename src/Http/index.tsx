@@ -50,6 +50,7 @@ class Http extends React.Component<Props, {}> {
         <FetchHttpRequest
           id={task.id}
           key={task.id}
+          defaults={this.props.defaults}
           baseUrl={this.props.baseUrl || ''}
           params={task.params}
           onStateChange={(taskState, data, meta) =>

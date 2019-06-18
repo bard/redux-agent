@@ -7,6 +7,7 @@ const debug = createDebug('agent:FetchHttpRequest')
 interface Props {
   id: number
   baseUrl: string
+  defaults: any
   params: RequestInit & { url: RequestInfo }
   onStateChange: (state: HttpTaskState, data: any, meta: any) => void
 }
@@ -40,6 +41,7 @@ class HttpRequest extends Component<Props, any> {
 
     const processedParams = {
       credentials: 'same-origin' as RequestCredentials,
+      ...this.props.defaults,
       ...params,
       body,
       headers

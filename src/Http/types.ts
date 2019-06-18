@@ -26,6 +26,7 @@ export interface StateSlice {
 
 export interface HttpAgentComponentOwnProps {
   baseUrl?: string
+  defaults?: any
 }
 
 export interface HttpAgentFactoryArgs {
