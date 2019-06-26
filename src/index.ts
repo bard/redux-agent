@@ -7,3 +7,5 @@ export { default as createHttpAgent } from './Http/index'
 export { default as createSocketAgent, MinimalWebSocket } from './Socket'
 export { default as createPwaInstallAgent } from './PwaInstall'
 export { default as createWebExtInstallAgent } from './WebExtInstall'
+import * as next from './next'
+export { next }

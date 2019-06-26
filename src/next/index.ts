@@ -1,0 +1,10 @@
+import 'core-js/features/object/entries'
+import { Task } from './types'
+export type Task = Task
+export { addTask, delTasks } from './helpers'
+export { default as reducer } from './reducer'
+export { default as Agent } from './Agent'
+export { default as HttpTask } from './HttpTask'
+export { default as TimeTask } from './TimeTask'
+export { default as RNGTask } from './RNGTask'
+export { default as WebSocketTask } from './WebSocketTask'
