@@ -49,12 +49,17 @@ const HttpTask: React.FunctionComponent<Props> = ({
           ? await response.json()
           : await response.text()
 
-        onEvent(
-          response.ok ? 'success' : 'failure',
-          data, {
-            status: response.status,
-            final: true
-          })
+        window.setTimeout(() => {
+          // Ensure that any error occurring as part of onEvent()
+          // (such as errors happening in the reducer) don't also
+          // trigger the catch() handler below.
+          onEvent(
+            response.ok ? 'success' : 'failure',
+            data, {
+              status: response.status,
+              final: true
+            })
+        })
       })
       .catch((err) => {
         onEvent('failure', null, {
