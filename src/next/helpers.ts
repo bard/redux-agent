@@ -1,4 +1,8 @@
 import { Task, SystemTask, State } from './types'
+import invariant from 'invariant'
+  invariant(draft.tasks,
+    'State not initialized for Redux Agent. ' +
+    'Did you call reduceReducers(..., taskReducer)?')
 
 export const addTask = <
   S extends State,

@@ -1,3 +1,4 @@
+import invariant from 'invariant'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
@@ -32,7 +33,12 @@ type Props = OwnProps & StateProps & DispatchProps
 const Agent: React.FunctionComponent<Props> = ({
   tasks, taskEvent,
   handlers, defaults
-}) => (
+}) => {
+  invariant(tasks,
+    'State not initialized for Redux Agent. ' +
+    'Did you call reduceReducers(..., taskReducer)?')
+
+  return (
     <>{Object.entries(tasks).map(([tid, task]) => {
       if (task.type === 'system') {
         return null
@@ -69,6 +75,7 @@ const Agent: React.FunctionComponent<Props> = ({
       }
     })}</>
   )
+}
 
 const mapStateToProps = (state: State): StateProps => ({
   tasks: state.tasks
@@ -90,4 +97,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Agent)
-
