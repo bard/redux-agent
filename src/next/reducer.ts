@@ -1,10 +1,10 @@
 import produce from 'immer'
-import { State, SystemTask } from './types'
+import { SystemTask } from './types'
 
-export default (
-  state: State,
+export default <S>(
+  state: S,
   action: any
-): State => produce(state, (draft: State) => {
+): S => produce(state, (draft: any) => {
   if (!draft.tasks) {
     const root: SystemTask = { type: 'system', nextTaskId: 0 }
     draft.tasks = { 0: root }

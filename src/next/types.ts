@@ -1,19 +1,75 @@
-export interface Task {
+interface BaseTask {
   type: string
 }
 
-export interface SystemTask extends Task {
+export interface IOTask extends BaseTask {
+  actions: { [type: string]: string }
+}
+
+export interface SystemTask {
+  type: 'system'
   nextTaskId: number
 }
 
-export interface IOTask extends Task {
+interface LocalStorageBaseTask {
+  type: 'storage'
+  key: string
   actions: {
-    [key: string]: string
+    success: string
+    failure: string
   }
 }
 
-export interface State {
-  tasks: { [tid: string]: Task }
+interface LocalStorageTaskDel extends LocalStorageBaseTask {
+  op: 'del'
 }
 
+interface LocalStorageTaskGet extends LocalStorageBaseTask {
+  op: 'get'
+}
 
+interface LocalStorageTaskPop extends LocalStorageBaseTask {
+  op: 'pop'
+}
+
+interface LocalStorageTaskSet extends LocalStorageBaseTask {
+  op: 'set'
+  data: any
+}
+
+interface LocalStorageTaskMerge extends LocalStorageBaseTask {
+  op: 'merge'
+  data: any
+}
+
+export type LocalStorageTask =
+  | LocalStorageTaskGet
+  | LocalStorageTaskPop
+  | LocalStorageTaskSet
+  | LocalStorageTaskMerge
+  | LocalStorageTaskDel
+
+interface HttpTask extends Partial<RequestInit> {
+  type: 'http'
+  url: string
+  body?: any
+  actions: {
+    success: string
+    failure: string
+  }
+}
+
+export type Task =
+  | BaseTask
+  | LocalStorageTask
+  | HttpTask
+  | SystemTask
+
+
+export interface TaskCollection {
+  [tid: string]: Task
+}
+
+export interface State {
+  tasks: TaskCollection
+}

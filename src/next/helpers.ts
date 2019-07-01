@@ -1,31 +1,32 @@
 import invariant from 'invariant'
 import withImmer from '../util/with-immer'
-import { Task, SystemTask } from './types'
+import { Task, TaskCollection, SystemTask } from './types'
 
-export const addTask = <T extends Task>(
-  // the 'tasks' state member is added at runtime, we don't want
-  // to enforce a type because the developer should not be concerned
-  // with how the state object is made to support a task store
-  state: any,
-  task: T
-) => withImmer(state, (draft: any) => {
-  invariant(draft.tasks,
+const getTasks = (state: any): TaskCollection => {
+  invariant(state.tasks,
     'State not initialized for Redux Agent. ' +
     'Did you call reduceReducers(..., taskReducer)?')
+  return state.tasks
+}
 
-  const systemTask = (draft.tasks[0] as SystemTask)
+export const addTask = <S>(
+  state: S,
+  task: Task
+): S => withImmer(state, (draft: S) => {
+  const tasks = getTasks(draft)
+  const systemTask = tasks[0] as SystemTask
   systemTask.nextTaskId += 1
-
-  draft.tasks[systemTask.nextTaskId] = task
+  tasks[systemTask.nextTaskId] = task
 })
 
-export const delTasks = <T extends Task>(
-  state: any,
-  taskFilter: (t: T) => boolean
-) => withImmer(state, (draft: any) => {
-  for (const tid in draft.tasks) {
-    if (taskFilter(draft.tasks[tid])) {
-      delete draft.tasks[tid]
+export const delTasks = <S>(
+  state: S,
+  taskFilter: (t: Task) => boolean
+): S => withImmer(state, (draft: S) => {
+  const tasks = getTasks(draft)
+  for (const tid in tasks) {
+    if (taskFilter(tasks[tid])) {
+      delete tasks[tid]
     }
   }
 })
