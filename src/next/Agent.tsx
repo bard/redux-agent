@@ -4,15 +4,17 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { State, Task, IOTask } from './types'
 
-type Handler = React.ComponentType<{
-  defaults: any,
-  params: any,
-  onEvent: any
-}>
+interface TaskHandler {
+  type: string
+  Component: React.ComponentType<{
+    params: any,
+    onEvent: any
+  }>
+  defaults: any
+}
 
 interface OwnProps {
-  handlers: { [type: string]: Handler }
-  defaults?: { [type: string]: any }
+  handlers: TaskHandler[]
 }
 
 interface StateProps {
@@ -30,9 +32,18 @@ interface DispatchProps {
 
 type Props = OwnProps & StateProps & DispatchProps
 
+const find = <T extends {}>(array: T[], fn: (arg: T) => boolean) => {
+  for (let i = 0; i < array.length; i++) {
+    if (fn(array[i])) {
+      return array[i]
+    }
+  }
+  return null
+}
+
 const Agent: React.FunctionComponent<Props> = ({
   tasks, taskEvent,
-  handlers, defaults
+  handlers
 }) => {
   invariant(tasks,
     'State not initialized for Redux Agent. ' +
@@ -44,32 +55,28 @@ const Agent: React.FunctionComponent<Props> = ({
         return null
       }
 
-      const HandlerComponent = handlers[task.type]
-      if (!HandlerComponent) {
+      const handler = find(handlers, (h) => h.type === task.type)
+      if (!handler) {
         throw new Error(`No handler for task type "${task.type}"`)
       }
-
-      defaults = defaults || {}
 
       if ('actions' in task) {
         const ioTask = task as IOTask
         const { type, actions, ...params } = ioTask
 
         return (
-          <HandlerComponent
+          <handler.Component
             key={tid}
-            defaults={defaults[type]}
-            params={params}
+            params={{ ...handler.defaults, ...params }}
             onEvent={(type: string, payload: any, meta: any) =>
               taskEvent({ id: tid, action: actions[type], payload, meta })} />
         )
       } else {
         const { type, ...params } = task
         return (
-          <HandlerComponent
+          <handler.Component
             key={tid}
-            defaults={defaults[type]}
-            params={params}
+            params={{ ...handler.defaults, ...params }}
             onEvent={() => { }} />
         )
       }

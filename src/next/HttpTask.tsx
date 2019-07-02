@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 
 interface OwnProps {
   params: any
-  defaults: any
   onEvent(
     type: 'success' | 'failure',
     data: any,
@@ -16,10 +15,10 @@ interface OwnProps {
 type Props = OwnProps
 
 const HttpTask: React.FunctionComponent<Props> = ({
-  params, defaults, onEvent
+  params, onEvent
 }) => {
   useEffect(() => {
-    const { url, ...reqParams } = params
+    const { url, baseUrl, ...reqParams } = params
 
     const headers = new Headers(params.headers)
     if (!headers.has('accept')) {
@@ -33,10 +32,7 @@ const HttpTask: React.FunctionComponent<Props> = ({
       body = JSON.stringify(params.body)
     }
 
-    const baseUrl = defaults ? defaults.baseUrl : null
-
     const fetchParams = {
-      ...defaults, // XXX includes baseUrl
       ...reqParams,
       body,
       headers
@@ -72,4 +68,8 @@ const HttpTask: React.FunctionComponent<Props> = ({
   return null
 }
 
-export default HttpTask
+export default {
+  type: 'http',
+  Component: HttpTask,
+  defaults: {}
+}

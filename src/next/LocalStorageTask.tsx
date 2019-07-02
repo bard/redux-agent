@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 
 interface OwnProps {
   params: any
-  defaults: any
   onEvent(
     type: 'success' | 'failure',
     data: any,
@@ -16,7 +15,7 @@ interface OwnProps {
 type Props = OwnProps
 
 const LocalStorageTask: React.FunctionComponent<Props> = ({
-  params, defaults, onEvent
+  params, onEvent
 }) => {
   useEffect(() => {
     const { op } = params
@@ -84,4 +83,8 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
   return null
 }
 
-export default LocalStorageTask
+export default {
+  Component: LocalStorageTask,
+  type: 'storage',
+  defaults: {}
+}

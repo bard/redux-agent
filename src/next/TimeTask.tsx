@@ -28,4 +28,8 @@ const TimeTask: React.FC<Props> = ({
   return null
 }
 
-export default TimeTask
+export default {
+  type: 'timer',
+  Component: TimeTask,
+  defaults: {}
+}

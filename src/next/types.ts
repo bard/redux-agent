@@ -1,4 +1,4 @@
-interface BaseTask {
+export interface BaseTask {
   type: string
 }
 
@@ -65,9 +65,8 @@ export type Task =
   | HttpTask
   | SystemTask
 
-
 export interface TaskCollection {
-  [tid: string]: Task
+  [tid: string]: BaseTask
 }
 
 export interface State {

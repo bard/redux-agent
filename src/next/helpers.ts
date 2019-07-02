@@ -1,6 +1,6 @@
 import invariant from 'invariant'
 import withImmer from '../util/with-immer'
-import { Task, TaskCollection, SystemTask } from './types'
+import { BaseTask, TaskCollection, SystemTask } from './types'
 
 const getTasks = (state: any): TaskCollection => {
   invariant(state.tasks,
@@ -9,9 +9,9 @@ const getTasks = (state: any): TaskCollection => {
   return state.tasks
 }
 
-export const addTask = <S>(
+export const addTask = <S, T extends BaseTask>(
   state: S,
-  task: Task
+  task: T
 ): S => withImmer(state, (draft: S) => {
   const tasks = getTasks(draft)
   const systemTask = tasks[0] as SystemTask
@@ -21,7 +21,7 @@ export const addTask = <S>(
 
 export const delTasks = <S>(
   state: S,
-  taskFilter: (t: Task) => boolean
+  taskFilter: (t: BaseTask) => boolean
 ): S => withImmer(state, (draft: S) => {
   const tasks = getTasks(draft)
   for (const tid in tasks) {

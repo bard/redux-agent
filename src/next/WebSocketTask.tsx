@@ -2,7 +2,6 @@ import React, { useEffect } from 'react'
 
 interface OwnProps {
   params: any
-  defaults: any
   onEvent(
     type: 'connect' | 'disconnect' | 'message' | 'error' | 'sent',
     data?: any,
@@ -17,12 +16,12 @@ type Props = OwnProps
 let socket: WebSocket | null = null
 
 const WebSocketTask: React.FunctionComponent<Props> = ({
-  params, defaults, onEvent
+  params, onEvent
 }) => {
   useEffect(() => {
     const initializeSocket = !socket
     if (initializeSocket) {
-      const { url } = defaults
+      const { url } = params
 
       socket = new WebSocket(url)
 
@@ -60,10 +59,14 @@ const WebSocketTask: React.FunctionComponent<Props> = ({
         socket = null
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return null
 }
 
-export default WebSocketTask
+export default {
+  type: 'socket',
+  Component: WebSocketTask,
+  defaults: {}
+}

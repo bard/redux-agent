@@ -21,4 +21,8 @@ const RNGTask: React.FC<Props> = ({
   return null
 }
 
-export default RNGTask
+export default {
+  type: 'rng',
+  Component: RNGTask,
+  defaults: {}
+}
