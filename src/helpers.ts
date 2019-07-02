@@ -1,5 +1,5 @@
 import invariant from 'invariant'
-import withImmer from '../util/with-immer'
+import withImmer from './util/with-immer'
 import { BaseTask, TaskCollection, SystemTask } from './types'
 
 const getTasks = (state: any): TaskCollection => {

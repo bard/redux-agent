@@ -2,8 +2,8 @@ import React from 'react'
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { withImmer, findIndex } from '../util'
-import Fragment from '../util/Fragment'
+import withImmer from '../../util/with-immer'
+import findIndex from '../../util/find-index'
 import {
   StateSlice,
   TrackedRequest,
@@ -52,7 +52,7 @@ const createRequestResponseAgent = <TrackedRequestParams extends {}>(
         />
       )
 
-      return <Fragment>{requests}</Fragment>
+      return <>{requests}</>
     }
 
     private requestDidChangeState(r: TrackedRequest) {

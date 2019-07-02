@@ -3,7 +3,8 @@ import createDebug from 'debug'
 import React from 'react'
 import { connect } from 'react-redux'
 import ReconnectingWebSocket from 'reconnecting-websocket'
-import { Fragment, withImmer, findIndex } from '../util'
+import withImmer from '../../util/with-immer'
+import findIndex from '../../util/find-index'
 import {
   SocketConnectionState,
   TrackedSocketMessage,
@@ -71,7 +72,7 @@ class Socket extends React.Component<Props, {}> {
     const { outbox = [] } = this.props
 
     return (
-      <Fragment>
+      <>
         {outbox.map((message) =>
           <OutgoingSocketMessage send={this.send.bind(this)}
             key={message.id}
@@ -79,7 +80,7 @@ class Socket extends React.Component<Props, {}> {
             data={message.data}
             onSent={() => this.messageWasSent(message.id)} />
         )}
-      </Fragment>
+      </>
     )
   }
 

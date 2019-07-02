@@ -3,7 +3,8 @@ import { createStandardAction, ActionType, getType } from 'typesafe-actions'
 import { Dispatch } from 'redux'
 import React from 'react'
 import { connect } from 'react-redux'
-import { withImmer, Fragment, findIndex } from '../util'
+import withImmer from '../../util/with-immer'
+import findIndex from '../../util/find-index'
 import FetchHttpRequest from './FetchHttpRequest'
 import {
   StateSlice,
@@ -45,7 +46,7 @@ class Http extends React.Component<Props, {}> {
       return null
     }
 
-    return <Fragment>{
+    return <>{
       this.props.tasks.map((task) =>
         <FetchHttpRequest
           id={task.id}
@@ -56,7 +57,7 @@ class Http extends React.Component<Props, {}> {
           onStateChange={(taskState, data, meta) =>
             this.props.taskFinished(task, taskState, data, meta)} />
       )
-    }</Fragment>
+    }</>
   }
 }
 

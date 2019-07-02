@@ -2,6 +2,7 @@ import invariant from 'invariant'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
+import find from './util/find'
 import { State, Task, IOTask } from './types'
 
 interface TaskHandler {
@@ -31,15 +32,6 @@ interface DispatchProps {
 }
 
 type Props = OwnProps & StateProps & DispatchProps
-
-const find = <T extends {}>(array: T[], fn: (arg: T) => boolean) => {
-  for (let i = 0; i < array.length; i++) {
-    if (fn(array[i])) {
-      return array[i]
-    }
-  }
-  return null
-}
 
 const Agent: React.FunctionComponent<Props> = ({
   tasks, taskEvent,
