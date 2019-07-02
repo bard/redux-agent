@@ -60,8 +60,8 @@ const Agent: React.FunctionComponent<Props> = ({
           <handler.Component
             key={tid}
             params={{ ...handler.defaults, ...params }}
-            onEvent={(type: string, payload: any, meta: any) =>
-              taskEvent({ id: tid, action: actions[type], payload, meta })} />
+            onEvent={(eventType: string, payload: any, meta: any) =>
+              taskEvent({ id: tid, action: actions[eventType], payload, meta })} />
         )
       } else {
         const { type, ...params } = task
@@ -69,7 +69,7 @@ const Agent: React.FunctionComponent<Props> = ({
           <handler.Component
             key={tid}
             params={{ ...handler.defaults, ...params }}
-            onEvent={() => { }} />
+            onEvent={() => null} />
         )
       }
     })}</>
@@ -82,12 +82,10 @@ const mapStateToProps = (state: State): StateProps => ({
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
   taskEvent({ id, payload, action, meta }) {
-    //    dispatch(actions.taskDone(id))
-
     dispatch({
       meta: { ...meta, taskId: id },
       type: action,
-      payload: payload
+      payload
     })
   }
 })
