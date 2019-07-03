@@ -1,57 +1,70 @@
-# redux-agent
+# Redux Agent
 
-Simple, reactive, middleware-free effect management for Redux+React applications. Drive non-visual effects (such as network I/O) the same way you drive visual effects (aka the UI): through changes to application state.
+React lets you describe a UI and shifts the actual work of drawing it to `ReactDOM.render`. It's a simple and powerful model, however it stops at visual I/O. Network requests and other non-visual I/O are usually performed in a thunk/saga/epic, scattering logic across middlewares and reducers, or from React components, coupling them to remote APIs.
 
-## Benefits
+**Redux Agent applies React's model to non-visual I/O**: describe a network request, a storage operation, a websocket message, etc., and let the runtime worry about performing it. Logic stays in the reducer, components stay decoupled, and it's easy to see what state triggers which effect.
 
-- Vanilla Redux architecture, no new concepts, just old ones doing new work
-- Reducer becomes the single source of logic, whether sync or async
-
-## Example
-
-Request data from an HTTP API and display it when received:
+Redux Agent doesn't introduce middleware or store enhancers, doesn't change Redux APIs, and doesn't involve exotic concepts. It has only one basic abstraction (the "task"). An HTTP request is as straightforward as:
 
 ```js
-const reducer = (state = { user: null }, action) => {
+import { addTask } from 'redux-agent'
+
+const reducer = (state, action) => {
   switch(action.type) {
-    case 'FETCH_USER':
-      return HttpAgent.addTask(state, {
+    case 'FETCH_TODO':
+      return addTask({
+        type: 'http',
         method: 'get',
-        url: 'http://jsonplaceholder.typicode.com/users/1'
-      }, {
-        success: 'USER_SUCCESS'
+        url: 'https://jsonplaceholder.typicode.com/todos/1',
+        actions: {
+          success: 'FETCH_TODO_SUCCESS',
+          failure: 'FETCH_TODO_FAILURE'
+        }
       })
-
-    case 'USER_SUCCESS':
-      return {
-        ...state,
-        user: action.payload
-      }
-
-    default:
-      return state
-  }
-}
 ```
 
-**"But I thought reducers must be pure?"**
+## Try it
 
-Yes. In fact, no network request is sent in the example above. The _information describing_ a request is stored in Redux state and then used to generate network output and handle network input, just like the _information describing_ an interface is stored in Redux state and then used to generate user output and handle user input.
+See Redux Agent in action in one of these interactive demos:
 
-For an in-depth explanation, see the [introduction and tutorial](https://redux-agent.org/intro/reactive-effect-management-with-redux-agent/).
+- [HTTP Requests](https://redux-agent.org/demo/#http)
+- [Timers](https://redux-agent.org/demo/#timer)
+- [Random Number Generation](https://redux-agent.org/demo/#rng)
+- [WebSocket Messaging](https://redux-agent.org/demo/#socket)
+
+## Q&A
+
+**"I thought that the reducer should stay free from side effects?"**
+
+Yes. In fact, `addTask` in the example above doesn't perform any effect, it only stores a task description in the state which is later used by the runtime to perform the effect, just like you normally store data in the state which is later used to render the UI.
+
+**"Is this like Elm?"**
+
+Quite. But whereas Elm's reducer returns the new state plus commands, Redux Agent considers active tasks an integral part of the application state and therefore keeps them in the state tree.
+
+**"Is this like redux-loop?"**
+
+Yes and no. Yes, since both make the reducer the single source of logic. No, since redux-loop changes the reducer's API so it can return state plus commands, whereas Redux Agent sticks to vanilla Redux.
 
 ## Documentation
 
-- [Getting started](https://redux-agent.org/getting-started/)
-- [Introduction and tutorial](https://redux-agent.org/guides/reactive-effect-management-with-redux-agent/)
-- [Status, limitations, and differences from other approaches](https://redux-agent.org/status-and-limitations/)
-- [HTTP Agent](https://redux-agent.org/guides/the-http-agent/): HTTP requests
-- [WebSocket Agent](https://redux-agent.org/guides/the-websocket-agent/): WebSocket messaging
-- (_docs under construction_) [HashLocation Agent](https://redux-agent.org/guides/the-hash-location-agent/): hash-based routing
-- (_docs under construction_) [PwaInstall Agent](https://redux-agent.org/guides/the-pwa-install-agent/): install flow for Progressive Web Applications
-- (_docs under construction_) [WebExtInstall Agent](https://redux-agent.org/guides/the-web-ext-install-agent/): install flow for web browser extensions
-- (_docs under construction_) [Tutorial: Writing a Redux Agent](https://redux-agent.org/guides/writing-a-redux-agent/)
+- [Quickstart](https://redux-agent.org/quickstart/)
+- [Tutorial](https://redux-agent.org/tutorial/)
+- [Limitations](https://redux-agent.org/limitations/)
+- Guides:
+    - [Specifying Task Defaults](https://redux-agent.org/guides/specifying-task-defaults/)
+    - [Immer Support](https://redux-agent.org/guides/immer-support/)
+- Reference:
+    - [HTTP](https://redux-agent.org/reference/http/): Send HTTP requests and track responses. Uses `window.fetch` under the hood
+    - [WebSocket](https://redux-agent.org/reference/websocket/): Connect to websocket endpoints, send and listen to messages
+    - [RNG](https://redux-agent.org/reference/random-number-generator/): Generate random numbers
+    - [Timer](https://redux-agent.org/reference/timer/): Dispatch an action at an interval
+    - [Storage](https://redux-agent.org/reference/storage/): Write to and read from DOM storage
 
 ## License
 
-MIT.
+MIT
+
+## Credits
+
+`reduceReducers` by [Tim Cheung](https://github.com/timche). Icon by [Setyo Ari Wibowo](https://thenounproject.com/razerk/).
