@@ -93,6 +93,11 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
+  "hooks": {
+    "before:init": "yarn typecheck && yarn lint",
+    "after:git:release": "yarn prebuild && yarn build",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   }
