@@ -6,7 +6,7 @@ interface OwnProps {
     type: 'success' | 'failure',
     data: any,
     meta?: {
-      status: number,
+      key: string
       final: boolean,
       err?: any
     }): void
@@ -26,9 +26,9 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const { key } = params
         const data = window.localStorage.getItem(key)
         if (data !== null) {
-          onEvent('success', { key, data: JSON.parse(data) })
+          onEvent('success', JSON.parse(data), { key, final: true })
         } else {
-          onEvent('failure', { key })
+          onEvent('failure', null, { key, final: true })
         }
         break
       }
@@ -37,14 +37,14 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const { key, data } = params
         // XXX assert key, data; find way of typing statically
         window.localStorage.setItem(key, JSON.stringify(data))
-        onEvent('success', { key })
+        onEvent('success', null, { key, final: true })
         break
       }
 
       case 'del': {
         const { key } = params
         window.localStorage.removeItem(key)
-        onEvent('success', { key })
+        onEvent('success', null, { key, final: true })
         break
       }
 
@@ -53,9 +53,9 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const data = window.localStorage.getItem(key)
         if (data !== null) {
           window.localStorage.removeItem(key)
-          onEvent('success', { key, data: JSON.parse(data) })
+          onEvent('success', JSON.parse(data), { key, final: true })
         } else {
-          onEvent('failure', { key })
+          onEvent('failure', null, { key, final: true })
         }
         break
       }
@@ -72,7 +72,7 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
           window.localStorage.setItem(key, JSON.stringify(data))
         }
 
-        onEvent('success', { key })
+        onEvent('success', null, { key, final: true })
         break
       }
     }
