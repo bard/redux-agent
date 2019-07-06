@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "target": "es5",
-    "jsx": "react"
-  }
-}
