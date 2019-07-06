@@ -1,24 +1,6 @@
-import React, { useEffect } from 'react'
-
-interface OwnProps {
-  params: any
-  onEvent(
-    type: 'success' | 'failure',
-    data: any,
-    meta?: {
-      key: string
-      final: boolean,
-      err?: any
-    }): void
-}
-
-type Props = OwnProps
-
-const LocalStorageTask: React.FunctionComponent<Props> = ({
-  params, onEvent
-}) => {
-  useEffect(() => {
-    const { op } = params
+export default () => {
+  const perform = (params: any, dispatch: any) => {
+    const { op, actions } = params
 
     switch (op) {
       case 'get': {
@@ -26,9 +8,16 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const { key } = params
         const data = window.localStorage.getItem(key)
         if (data !== null) {
-          onEvent('success', JSON.parse(data), { key, final: true })
+          dispatch({
+            type: actions.success,
+            payload: JSON.parse(data),
+            meta: { key, final: true }
+          })
         } else {
-          onEvent('failure', null, { key, final: true })
+          dispatch({
+            type: actions.failure,
+            meta: { key, final: true }
+          })
         }
         break
       }
@@ -37,14 +26,20 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const { key, data } = params
         // XXX assert key, data; find way of typing statically
         window.localStorage.setItem(key, JSON.stringify(data))
-        onEvent('success', null, { key, final: true })
+        dispatch({
+          type: actions.success,
+          meta: { key, final: true }
+        })
         break
       }
 
       case 'del': {
         const { key } = params
         window.localStorage.removeItem(key)
-        onEvent('success', null, { key, final: true })
+        dispatch({
+          type: actions.success,
+          meta: { key, final: true }
+        })
         break
       }
 
@@ -53,9 +48,16 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
         const data = window.localStorage.getItem(key)
         if (data !== null) {
           window.localStorage.removeItem(key)
-          onEvent('success', JSON.parse(data), { key, final: true })
+          dispatch({
+            type: actions.success,
+            payload: JSON.parse(data),
+            meta: { key, final: true }
+          })
         } else {
-          onEvent('failure', null, { key, final: true })
+          dispatch({
+            type: actions.failure,
+            meta: { key, final: true }
+          })
         }
         break
       }
@@ -72,19 +74,17 @@ const LocalStorageTask: React.FunctionComponent<Props> = ({
           window.localStorage.setItem(key, JSON.stringify(data))
         }
 
-        onEvent('success', null, { key, final: true })
+        dispatch({
+          type: actions.success,
+          meta: { key, final: true }
+        })
         break
       }
     }
+  }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  return null
-}
-
-export default {
-  Component: LocalStorageTask,
-  type: 'storage',
-  defaults: {}
+  return {
+    perform,
+    type: 'storage'
+  }
 }

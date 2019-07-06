@@ -1,11 +1,12 @@
-import invariant from 'invariant'
 import withImmer from './util/with-immer'
 import { BaseTask, TaskCollection, SystemTask } from './types'
 
 const getTasks = (state: any): TaskCollection => {
-  invariant(state.tasks,
-    'State not initialized for Redux Agent. ' +
-    'Did you call reduceReducers(..., taskReducer)?')
+  if (!('tasks' in state)) {
+    throw new Error('State not initialized for Redux Agent. ' +
+      'Did you call reduceReducers(..., taskReducer)?')
+  }
+
   return state.tasks
 }
 
