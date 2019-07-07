@@ -8,12 +8,22 @@ type WebSocketLike = Pick<
 
 interface Config {
   socketFactory?: (url?: string) => WebSocketLike
+  encode: (data: any) => any
+  decode: (data: any) => any
 }
 
 export default (config?: Config) => {
-  const createSocket = (config && config.socketFactory)
+  const createSocket = config && config.socketFactory
     ? config.socketFactory
-    : (url: string) => new WebSocket(url)
+    : ((url: string) => new WebSocket(url))
+
+  const encoder = config && config.encode
+    ? config.encode
+    : JSON.stringify
+
+  const decoder = config && config.decode
+    ? config.decode
+    : JSON.parse
 
   let socket: WebSocketLike | null = null
 
@@ -49,7 +59,7 @@ export default (config?: Config) => {
       socket.onmessage = ({ data }: MessageEvent) => {
         dispatch({
           type: actions.message,
-          payload: JSON.parse(data)
+          payload: decoder(data)
         })
       }
     }
@@ -61,7 +71,7 @@ export default (config?: Config) => {
 
     if (op === 'send') {
       // if socket connected, otherwise schedule for later
-      socket!.send(JSON.stringify(params.data))
+      socket!.send(encoder(params.data))
       dispatch({
         type: actions.sent,
         meta: { final: true }
