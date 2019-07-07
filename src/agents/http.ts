@@ -1,12 +1,14 @@
 interface Config {
   baseUrl?: string
+  fetchDefaults?: any
 }
 
 export default (config?: Config) => {
   const baseUrl = config && config.baseUrl || ''
+  const fetchDefaults = config && config.fetchDefaults || {}
 
   const perform = (params: any, dispatch: any) => {
-    const { url, actions, ...reqParams } = params
+    const { url, actions, ...fetchParams } = params
 
     const headers = new Headers(params.headers)
     if (!headers.has('accept')) {
@@ -20,13 +22,12 @@ export default (config?: Config) => {
       body = JSON.stringify(params.body)
     }
 
-    const fetchParams = {
-      ...reqParams,
+    fetch(baseUrl ? baseUrl + url : url, {
+      ...fetchDefaults,
+      ...fetchParams,
       body,
       headers
-    }
-
-    fetch(baseUrl ? baseUrl + url : url, fetchParams)
+    })
       .then(async (response) => {
         const contentType = response.headers.get('content-type')
         const data = (contentType && contentType.indexOf('application/json') !== -1)
@@ -34,9 +35,10 @@ export default (config?: Config) => {
           : await response.text()
 
         window.setTimeout(() => {
-          // Ensure that any error occurring as part of onEvent()
+          // Ensure that errors occurring as part of dispatch()
           // (such as errors happening in the reducer) don't also
-          // trigger the catch() handler below.
+          // trigger the catch() handler below resulting in a double
+          // dispatch.
 
           dispatch({
             type: response.ok ? actions.success : actions.failure,
