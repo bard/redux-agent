@@ -39,6 +39,19 @@ See Redux Agent in action in one of these interactive demos:
 
 Yes. In fact, `addTask` in the example above doesn't perform any effect, it only stores a task description in the state which is later used by the runtime to perform the effect, just like you normally store data in the state which is later used to render the UI.
 
+**"What if I want to not just add a task but also modify the state in other ways?"**
+
+`addTask` simply returns a new state that includes the desired task; you can further derive new states as usual:
+
+```diff
+    case 'FETCH_TODO':
+-     return addTask(state, { /* ... */ })
++     const s1 = addTask(state, { /* ... */ })
++     return { ...s1, isLoading: true }
+```
+
+Or make it even easier on the eyes with Redux Agent's built-in [support for Immer](https://redux-agent.org/guides/immer-support/).
+
 **"Is this similar to Elm?"**
 
 Quite. But whereas Elm's reducer returns the new state plus commands, Redux Agent considers active tasks an integral part of the application state and therefore keeps them in the state tree.
