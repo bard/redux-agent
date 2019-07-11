@@ -1,10 +1,10 @@
 # Redux Agent
 
-In the field of UI engineering, React gave us a way of describing the interface and letting the machine worry about how to draw it. It's a simple and powerful model, however it stops at visual I/O. Network requests and other non-visual I/O are usually performed in thunks/sagas/epics (scattering logic across middlewares and reducers) or from UI components (coupling them to remote APIs).
+In UI development, React lets you describe the interface and have the machine worry about drawing it. A simple and powerful model which unfortunately stops at visual I/O. Non-visual I/O such as network requests is usually done in thunks/sagas/epics (scattering logic across middlewares and reducers) or in UI components (coupling them to remote APIs).
 
-**Redux Agent applies React's model to non-visual I/O**: describe a network request, a storage operation, a websocket message, etc., and let the runtime worry about performing it. Logic stays in the reducer, components stay decoupled, and it's easy to see what state triggers which effect.
+**Redux Agent extends React's model to non-visual I/O**: describe a network request, a storage operation, a websocket message, ... and let the machine worry about performing it. Logic stays in the reducer, components stay lightweight, and it's easy to see what state triggers which effect.
 
-Redux Agent doesn't introduce middleware or store enhancers, doesn't modify Redux APIs, and doesn't involve exotic concepts. It has only one basic abstraction (the "task") and works with any UI runtime. An HTTP request is as simple as:
+Redux Agent doesn't introduce middlewares, doesn't modify existing APIs, and doesn't involve exotic concepts; it has only one basic abstraction (the "task") and is UI agnostic. Sending an HTTP request is as simple as:
 
 ```js
 import { addTask } from 'redux-agent'
@@ -21,16 +21,21 @@ const reducer = (state, action) => {
           failure: 'FETCH_TODO_FAILURE'
         }
       })
+    case 'FETCH_TODO_SUCCESS':
+      return {
+        ...state,
+        items: [ ...state.items, action.payload ]
+      }
 ```
 
 ## Try it
 
-See Redux Agent in action in one of these interactive demos:
+See Redux Agent in action in one of these interactive examples:
 
-- [HTTP Requests](https://redux-agent.org/demo/#http)
-- [Timers](https://redux-agent.org/demo/#timer)
-- [Random Number Generation](https://redux-agent.org/demo/#rng)
-- [WebSocket Messaging](https://redux-agent.org/demo/#socket)
+- [HTTP Requests](https://redux-agent.org/examples/#http)
+- [Timers](https://redux-agent.org/examples/#timer)
+- [Random Number Generation](https://redux-agent.org/examples/#rng)
+- [WebSocket Messaging](https://redux-agent.org/examples/#socket)
 - DOM Storage (_coming soon_)
 
 ## Q&A
@@ -41,7 +46,7 @@ Yes. In fact, `addTask` in the example above doesn't perform any effect, it only
 
 **"What if I want to not just add a task but also modify the state in other ways?"**
 
-`addTask` simply returns a new state that includes the desired task; you can further derive new states as usual:
+`addTask` simply returns a new state that includes the desired task. You can further derive new states as usual:
 
 ```diff
     case 'FETCH_TODO':

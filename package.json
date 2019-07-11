@@ -16,7 +16,7 @@
     "email": "hyperstruct@gmail.com",
     "url": "https://massimilianomirra.com"
   },
-  "description": "Simple, declarative, reducer-driven effects",
+  "description": "Declarative, middleware-free effect model",
   "keywords": [
     "redux",
     "react",
