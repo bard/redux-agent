@@ -15,6 +15,12 @@ export const configureAgents = (agents: any[], store: Store) => {
   let currentTasks: { [tid: string]: any } = {}
   const cleanupers: { [tid: string]: any } = {}
 
+  const dispatch = (tid: string) => (action: any) =>
+    store.dispatch({
+      ...action,
+      meta: { ...action.meta, taskId: tid }
+    })
+
   return () => {
     const previousTasks = currentTasks
     // @ts-ignore
@@ -35,7 +41,7 @@ export const configureAgents = (agents: any[], store: Store) => {
           throw new Error(`No handler for task type "${task.type}"`)
         }
 
-        const cleanup = handler.perform(task, store.dispatch, handler.config)
+        const cleanup = handler.perform(task, dispatch(tid), handler.config)
         if (cleanup) {
           cleanupers[tid] = cleanup
         }
