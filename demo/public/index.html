@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <script>
+      window.ga = window.ga || function() {
+        (ga.q = ga.q || []).push(arguments)
+      }
+      ga.l = +new Date
+      /* Setup integration and send page view */
+      ga("create", "UA-115973238-4", "auto")
+      ga("set", "anonymizeIp", true)
+      ga("send", "pageview")
+      /* Register handler to log search on blur */
+      document.addEventListener("DOMContentLoaded", () => {
+        if (document.forms.search) {
+          var query = document.forms.search.query
+          query.addEventListener("blur", function() {
+            if (this.value) {
+              var path = document.location.pathname;
+              ga("send", "pageview", path + "?q=" + this.value)
+            }
+          })
+        }
+      })
+    </script>
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+    <title>Interactive examples - Redux Agent · declarative, middleware-free effect model</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

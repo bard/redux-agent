@@ -1,0 +1,65 @@
+digraph "state transitions" {
+  fontname="Helvetica" fontsize=12 penwidth=2.0 splines=true ordering=out compound=true overlap=scale nodesep=0.3 ranksep=0.1
+  node [shape=plaintext style=filled fillcolor=transparent fontname=Helvetica fontsize=12 penwidth=2.0]
+  edge [fontname=Helvetica fontsize=10]
+
+    "initial" [shape=circle style=filled fillcolor=black fixedsize=true height=0.15 label=""]
+    "CheckingSession" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">CheckingSession</td></tr>
+      </table>
+    >]
+    "final" [shape=circle style=filled fillcolor=black fixedsize=true height=0.15 peripheries=2 label=""]
+    subgraph "cluster_Authentication Flow" {
+      label= <
+      <table cellborder="0" border="0">
+        <tr><td>Authentication Flow</td></tr>
+      </table>
+      > style=rounded penwidth=2.0
+      "Authentication Flow" [shape=point style=invis margin=0 width=0 height=0 fixedsize=true]
+        "SubmissionConfirmation" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">SubmissionConfirmation</td></tr>
+      </table>
+    >]
+    "Error" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">Error</td></tr>
+      </table>
+    >]
+    "CollectingInput" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">CollectingInput</td></tr>
+      </table>
+    >]
+    "SubmittingCredentials" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">SubmittingCredentials</td></tr>
+      </table>
+    >]
+    "VerifyingToken" [margin=0 label= <
+      <table align="center" cellborder="0" border="2" style="rounded" width="48">
+        <tr><td width="48" cellpadding="7">VerifyingToken</td></tr>
+      </table>
+    >]
+      "note_SubmissionConfirmation" [label="tell user to check email\lfor confirmation email\l" shape=note fontsize=10 fillcolor="#ffffcc" penwidth=1.0]
+      "SubmissionConfirmation" -> "note_SubmissionConfirmation" [style=dashed arrowtail=none arrowhead=none]
+      "note_Error" [label="offer to re-enter\laddress or re-send\lconfirmation email\l" shape=note fontsize=10 fillcolor="#ffffcc" penwidth=1.0]
+      "Error" -> "note_Error" [style=dashed arrowtail=none arrowhead=none]
+      "note_CollectingInput" [label="display a form for\le-mail and listen to\lbrowser location to\ldetect token\l" shape=note fontsize=10 fillcolor="#ffffcc" penwidth=1.0]
+      "CollectingInput" -> "note_CollectingInput" [style=dashed arrowtail=none arrowhead=none]
+
+    }
+      "note_final" [label="dashboard or other\lkind of \"home\" UI\l" shape=note fontsize=10 fillcolor="#ffffcc" penwidth=1.0]
+      "final" -> "note_final" [style=dashed arrowtail=none arrowhead=none]
+
+    "initial" -> "CheckingSession" [label="APP_LOADED   \l"]
+    "CheckingSession" -> "CollectingInput" [label="SESSION_FAILURE   \l"]
+    "CheckingSession" -> "final" [label="SESSION_SUCCESS   \l"]
+    "CollectingInput" -> "SubmittingCredentials" [label="CREDENTIALS_ENTERED   \l"]
+    "CollectingInput" -> "VerifyingToken" [label="TOKEN_PROVIDED   \l"]
+    "SubmittingCredentials" -> "Error" [label="SUBMIT_CREDENTIALS_FAILURE   \l"]
+    "SubmittingCredentials" -> "SubmissionConfirmation" [label="SUBMIT_CREDENTIALS_SUCCESS   \l"]
+    "VerifyingToken" -> "final" [label="VERIFY_TOKEN_SUCCESS   \l"]
+    "VerifyingToken" -> "Error" [label="VERIFY_TOKEN_FAILURE   \l"]
+}

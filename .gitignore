@@ -8,3 +8,6 @@ yarn-error.log*
 /examples/*/yarn.lock
 /examples/*/dist
 .cache/
+_attic
+docs/examples/
+demo/build

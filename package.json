@@ -66,7 +66,8 @@
     "lint": "tslint --project . && tsfmt --verify -r",
     "typecheck": "tsc --noEmit --pretty false",
     "visualize": "source-map-explorer --html dist/redux-agent.esm.js dist/redux-agent.esm.js.map > source.html",
-    "release": "release-it"
+    "release": "release-it",
+    "deploy:docs": " yarn --cwd demo && yarn --cwd demo build && cp -r demo/build/ docs/examples/ && mkdocs gh-deploy --force"
   },
   "peerDependencies": {
     "react-dom": "^16.8.4",

@@ -1,0 +1,33 @@
+initial,
+CheckingSession,
+"Authentication Flow" {
+
+  # tell user to check email
+  # for confirmation email
+  SubmissionConfirmation,
+
+  # offer to re-enter
+  # address or re-send
+  # confirmation email
+  Error,
+
+  # display a form for
+  # e-mail and listen to
+  # browser location to
+  # detect token
+  CollectingInput;
+
+  CollectingInput => SubmittingCredentials : CREDENTIALS_ENTERED;
+  CollectingInput => VerifyingToken : TOKEN_PROVIDED;
+  SubmittingCredentials => Error : SUBMIT_CREDENTIALS_FAILURE;
+  SubmittingCredentials => SubmissionConfirmation : SUBMIT_CREDENTIALS_SUCCESS;
+  VerifyingToken => final : VERIFY_TOKEN_SUCCESS;
+  VerifyingToken => Error : VERIFY_TOKEN_FAILURE;
+},
+# dashboard or other
+# kind of "home" UI
+final;
+
+initial => CheckingSession : APP_LOADED;
+CheckingSession => CollectingInput : SESSION_FAILURE;
+CheckingSession => final : SESSION_SUCCESS;

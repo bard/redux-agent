@@ -1,0 +1,80 @@
+# Project information
+site_name: Redux Agent
+site_description: Redux Agent lets you drive effects from reducers without making them impure and keeping business logic in a single place.
+site_author: Massimiliano Mirra
+site_url: https://redux-agent.org
+
+# Repository
+repo_name: bard/redux-agent
+repo_url: https://github.com/bard/redux-agent
+#edit_uri: ""
+edit_uri: edit/docs/docs
+
+# Copyright
+copyright: 'Copyright &copy; 2019 Massimiliano Mirra'
+
+# Configuration
+theme:
+  name: material
+  favicon: images/favicon.png
+  logo: images/logo.svg
+  features:
+    - tabs
+  include_search_page: false
+  search_index_only: true
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/bard
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/massimilianomirra
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - meta
+  - smarty
+  - markdown.extensions.def_list
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+
+extra_css:
+  - css/extra.css
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/tomorrow-night-eighties.min.css
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/languages/diff.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/languages/javascript.min.js
+  - js/extra.js
+
+# Page tree
+nav:
+  - Home: index.md
+  - Examples:
+    - HTTP: /examples/#http
+    - Timer: /examples/#timer
+    - Random Number: /examples/#rng
+    - WebSocket: /examples/#socket
+  - Quickstart: quickstart.md
+  - Tutorial: tutorial.md
+  - Limitations: limitations.md
+  - Guides:
+    - Immer Support: guides/immer-support.md
+    - (draft) Writing a robust, reusable login flow with redux‑agent and state charts: guides/a-robust-reusable-login-flow-with-redux-agent-and-state-charts.md
+  - Reference:
+    - HTTP: reference/http.md
+    - WebSocket: reference/websocket.md
+    - Timer: reference/timer.md
+    - RNG: reference/random-number-generator.md
+    - Storage: reference/storage.md
+  - License: license.md
+  - Related material: related-material.md
+
+copyright: Copyright &copy; 2019 Massimiliano Mirra
