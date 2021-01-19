@@ -1,0 +1,1257 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Redux Agent lets you drive effects from reducers without making them impure and keeping business logic in a single place.">
+      
+      
+      
+        <meta name="author" content="Massimiliano Mirra">
+      
+      
+        <link rel="canonical" href="https://redux-agent.org/guides/a-robust-reusable-login-flow-with-redux-agent-and-state-charts/">
+      
+      <link rel="shortcut icon" href="../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.2.5">
+    
+    
+      
+        <title>(draft) Writing a robust, reusable login flow with redux‑agent and state charts - Redux Agent</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.15aa0b43.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.75751829.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/tomorrow-night-eighties.min.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+      
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#writing-a-robust-reusable-login-flow-with-reduxagent-and-state-charts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://redux-agent.org" title="Redux Agent" class="md-header-nav__button md-logo" aria-label="Redux Agent">
+      
+  <img src="../../images/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      <div class="md-header-nav__ellipsis">
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            Redux Agent
+          </span>
+        </div>
+        <div class="md-header-nav__topic">
+          <span class="md-ellipsis">
+            
+              (draft) Writing a robust, reusable login flow with redux‑agent and state charts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/bard/redux-agent/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bard/redux-agent
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://redux-agent.org" title="Redux Agent" class="md-nav__button md-logo" aria-label="Redux Agent">
+      
+  <img src="../../images/logo.svg" alt="logo">
+
+    </a>
+    Redux Agent
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/bard/redux-agent/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bard/redux-agent
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+      
+      <label class="md-nav__link" for="nav-2">
+        Examples
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Examples" data-md-level="1">
+        <label class="md-nav__title" for="nav-2">
+          <span class="md-nav__icon md-icon"></span>
+          Examples
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/examples/#http" class="md-nav__link">
+        HTTP
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/examples/#timer" class="md-nav__link">
+        Timer
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/examples/#rng" class="md-nav__link">
+        Random Number
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/examples/#socket" class="md-nav__link">
+        WebSocket
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorial/" class="md-nav__link">
+        Tutorial
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../limitations/" class="md-nav__link">
+        Limitations
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6" checked>
+      
+      <label class="md-nav__link" for="nav-6">
+        Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="nav-6">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../immer-support/" class="md-nav__link">
+        Immer Support
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          (draft) Writing a robust, reusable login flow with redux‑agent and state charts
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        (draft) Writing a robust, reusable login flow with redux‑agent and state charts
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-design" class="md-nav__link">
+    The design
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-implementation" class="md-nav__link">
+    The implementation
+  </a>
+  
+    <nav class="md-nav" aria-label="The implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-state-object" class="md-nav__link">
+    The state object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-reducer" class="md-nav__link">
+    The reducer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-if-a-session-exists" class="md-nav__link">
+    Checking if a session exists
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collecting-input" class="md-nav__link">
+    Collecting input
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notice-a-pattern" class="md-nav__link">
+    Notice a pattern?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-error-control-state-and-the-retry-action" class="md-nav__link">
+    The Error control state and the RETRY action
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integrating-the-reducer" class="md-nav__link">
+    Integrating the reducer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    Notes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading-about-redux-agent" class="md-nav__link">
+    Further reading about redux-agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading-about-state-charts" class="md-nav__link">
+    Further reading about state charts
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" >
+      
+      <label class="md-nav__link" for="nav-7">
+        Reference
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="nav-7">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/http/" class="md-nav__link">
+        HTTP
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/websocket/" class="md-nav__link">
+        WebSocket
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/timer/" class="md-nav__link">
+        Timer
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/random-number-generator/" class="md-nav__link">
+        RNG
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/storage/" class="md-nav__link">
+        Storage
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../related-material/" class="md-nav__link">
+        Related material
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-design" class="md-nav__link">
+    The design
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-implementation" class="md-nav__link">
+    The implementation
+  </a>
+  
+    <nav class="md-nav" aria-label="The implementation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-state-object" class="md-nav__link">
+    The state object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-reducer" class="md-nav__link">
+    The reducer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-if-a-session-exists" class="md-nav__link">
+    Checking if a session exists
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collecting-input" class="md-nav__link">
+    Collecting input
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notice-a-pattern" class="md-nav__link">
+    Notice a pattern?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-error-control-state-and-the-retry-action" class="md-nav__link">
+    The Error control state and the RETRY action
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integrating-the-reducer" class="md-nav__link">
+    Integrating the reducer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    Notes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading-about-redux-agent" class="md-nav__link">
+    Further reading about redux-agent
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading-about-state-charts" class="md-nav__link">
+    Further reading about state charts
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/bard/redux-agent/edit/docs/docs/guides/a-robust-reusable-login-flow-with-redux-agent-and-state-charts.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="writing-a-robust-reusable-login-flow-with-reduxagent-and-state-charts">Writing a robust, reusable login flow with redux‑agent and state charts<a class="headerlink" href="#writing-a-robust-reusable-login-flow-with-reduxagent-and-state-charts" title="Permanent link">&para;</a></h1>
+<p><em>Work in progress, 90% finished, missing sections point to the relevant parts of the repository for the project.</em></p>
+<p>Web application login is a complex puzzle: many possible error conditions, flows that stop on one page and resume on another (think email verification or OAuth), invitation codes, communication consent, &hellip; and all at a time when the user is least motivated to keep going if anything goes wrong.</p>
+<p>We&rsquo;ll see how to implement a login flow using redux-agent with some help from state charts. We want a result that is robust and understandable, and a process to achieve that through method, not effort. State charts aren&rsquo;t a requirement for using redux-agent, the two just happen to work beautifully together.</p>
+<p>Instead of the textbook username/password example, we&rsquo;ll make things more interesting by allowing the user to enter just an email and receive a one-time login link (what is sometimes called the &ldquo;magic link&rdquo; auth strategy). This will make the flow more complex but will remove friction for the user (one less password to come up with) and work for back end engineers (no passwords to store).</p>
+<p>Thanks to redux-agent&rsquo;s model, we&rsquo;ll be able to place the logic in a self-contained reducer that: </p>
+<ul>
+<li>can be reused elsewhere with minimal modification</li>
+<li>shows clearly what state leads to which effects</li>
+<li>is independent of any particular UI framework</li>
+</ul>
+<p>Let&rsquo;s get started!</p>
+<h2 id="the-design">The design<a class="headerlink" href="#the-design" title="Permanent link">&para;</a></h2>
+<p>In a perfect world, only this would happen:</p>
+<ol>
+<li>app loads</li>
+<li>user enters email and clicks &ldquo;send me a login link&rdquo;</li>
+<li>app tells user that email is on its way </li>
+<li>user opens inbox, finds email, and clicks on the link containing the token</li>
+<li>app loads again</li>
+<li>app verifies token</li>
+<li>app displays the main interface (home, dashboard, &hellip;)</li>
+</ol>
+<p>Meanwhile, in the real world, the verification token may have expired and we should offer to resend the confirmation email; the server may be unreachable and we should notify the user; the user may be already logged in and we should show the main UI immediately&hellip; </p>
+<p>Here&rsquo;s a more realistic view of the possible flows, represented as a &ldquo;state chart&rdquo;. In it, a box represents a state that the application may be in; I&rsquo;ll call it a <em>control state</em> to avoid confusion with <em>Redux state</em>. (To name such states, I like to ask &ldquo;What&rsquo;s the application doing at this point?&rdquo;) A label represents an input that the application will accept in a given state (a user action, a server response, &hellip;).</p>
+<p><img alt="diagram" src="../diagram.png" /></p>
+<p>I won&rsquo;t go into details here about state charts, I&rsquo;ll just point out some of their benefits and encourage you to look more into them (pointers provided at the end):</p>
+<ul>
+<li>They make the implicit state machines your code already contains (in the form of <code>isLoading</code>, <code>isError</code>, etc.) explicit and thus easier to reason about</li>
+<li>They represent complex processes in a digestible form for both developers and designers</li>
+<li>They make it obvious when some case isn&rsquo;t covered</li>
+<li>They make implementation systematic and refreshingly <em>boring</em></li>
+<li>With a little runtime support, they eliminate an entire class of bugs (the one caused by input coming in at invalid times such as double submits)</li>
+</ul>
+<h2 id="the-implementation">The implementation<a class="headerlink" href="#the-implementation" title="Permanent link">&para;</a></h2>
+<p>The finished project is available on GitHub, clone it to follow along or play with it. It contains a basic React UI which we&rsquo;ll (mostly) not discuss in the article because <code>redux-agent</code> is independent of any particular UI framework.</p>
+<pre><code class="language-sh">$ git clone https://github.com/bard/redux-agent-login-tutorial.git
+$ cd redux-agent-login-tutorial
+$ npm install
+$ npm start
+</code></pre>
+<h3 id="the-state-object">The state object<a class="headerlink" href="#the-state-object" title="Permanent link">&para;</a></h3>
+<pre><code class="language-js">{
+  // A name that answers the question, &quot;What's the 
+  // application doing right now?&quot;
+  //
+  // E.g.: 'Starting', 'CheckingSession', 'CollectingInput',
+  // 'SubmittingCredentials', ...
+
+  controlState: 'Starting',
+
+  // Some data specific to the 'Error' control state
+
+  error: {
+    // Error information, if any, to display to the user
+    message: null,
+
+    // State to go back to when the RETRY action is received
+    retryState: null,
+
+    // Optional task to re-run when retrying
+    retryTask: null
+  }
+}
+</code></pre>
+<h3 id="the-reducer">The reducer<a class="headerlink" href="#the-reducer" title="Permanent link">&para;</a></h3>
+<p>Let&rsquo;s start by enumerating the inputs (&ldquo;actions&rdquo; in Redux parlance) the system will respond to. These is essentially a copy/paste of the labels in the diagram we&rsquo;ve seen above:</p>
+<p><code>reducer.js</code>:</p>
+<pre><code class="language-js">import { addTask } from 'redux-agent'
+
+// UI ACTIONS
+
+export const APP_LOADED = 'APP_LOADED'
+export const CREDENTIALS_ENTERED = 'CREDENTIALS_ENTERED'
+export const TOKEN_PROVIDED = 'TOKEN_PROVIDED'
+
+// NETWORK ACTIONS
+
+export const SESSION_SUCCESS = 'SESSION_SUCCESS'
+export const SESSION_FAILURE = 'SESSION_FAILURE'
+export const SUBMIT_CREDENTIALS_SUCCESS = 'SUBMIT_CREDENTIALS_SUCCESS'
+export const SUBMIT_CREDENTIALS_FAILURE = 'SUBMIT_CREDENTIALS_FAILURE'
+export const VERIFY_TOKEN_SUCCESS = 'VERIFY_TOKEN_SUCCESS'
+export const VERIFY_TOKEN_FAILURE = 'VERIFY_TOKEN_FAILURE'
+
+const reducer = (state, action) =&gt; {
+  switch (action.type) {
+    case APP_LOADED: {
+
+    }
+    case CREDENTIALS_ENTERED: {
+
+    }
+    case TOKEN_PROVIDED: {
+
+    }
+    case SESSION_SUCCESS: {
+
+    }
+
+    // ... and so on ...
+
+    default:
+      return state
+  }
+}
+
+export default reducer
+</code></pre>
+<h3 id="checking-if-a-session-exists">Checking if a session exists<a class="headerlink" href="#checking-if-a-session-exists" title="Permanent link">&para;</a></h3>
+<p>At the beginning, when the application is loading, we expect to receive an <code>APP_LOADED</code> action. How that action is dispatched is up to you and your UI framework of choice. In the React-based example app it is:</p>
+<p><code>App.jsx</code>:</p>
+<pre><code class="language-jsx">import React, { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { APP_LOADED } from './reducers/login'
+
+const App = () =&gt; {
+  const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  // Passing an empty dependency array to only run effect at mount time
+  useEffect(() =&gt; { dispatch({ type: APP_LOADED }) }, [])
+
+  return (&lt;div&gt;...&lt;/div&gt;)
+}
+
+export default App
+</code></pre>
+<p>Once the application has loaded, we want to check if we have a session already, because if we do, we can skip the login flow entirely. We&rsquo;ll do that by querying the (mocked) REST API for a resource that is only available to logged-in users, e.g. <code>/account</code>:</p>
+<pre><code class="language-js">case APP_LOADED: {
+  return addTask(state, {
+    type: 'http',
+    method: 'get',
+    url: '/account',
+    actions: {
+      success: SESSION_SUCCESS,
+      failure: SESSION_FAILURE
+    }
+  })
+}
+</code></pre>
+<p>We can make that easier on the eyes by taking a page out of Redux conventions and encapsulating the task in a task creator, as we would do with actions and action creators:</p>
+<pre><code class="language-js">const checkSession = () =&gt; ({
+  type: 'http',
+  method: 'get',
+  url: '/account',
+  actions: {
+    success: SESSION_SUCCESS,
+    failure: SESSION_FAILURE
+  }
+})
+
+const reducer = (state, action) =&gt; {
+  switch(action.type) {
+    case APP_LOADED: {
+      return addTask(state, checkSession())
+    }
+</code></pre>
+<p>We&rsquo;ll also keep track of what control state we&rsquo;re in, for two purposes:</p>
+<ol>
+<li>we can use that information in the UI (e.g. show a loader, change screen, disable input)</li>
+<li>we can make sure that we don&rsquo;t handle actions out of their intended context (such as when a user clicks a form &ldquo;submit&rdquo; button a second time)</li>
+</ol>
+<p>Tracking the control state is trivial:</p>
+<pre><code class="language-diff">  case APP_LOADED: {
+-   return addTask(state, checkSession())
++   const newState = addTask(state, checkSession())
++
++   return { ...newState, controlState: 'CheckingSession' }
+  }
+</code></pre>
+<p>And to handle <code>APP_LOADED</code> only if we&rsquo;re in the <code>Starting</code> control state:</p>
+<pre><code class="language-diff">  case APP_LOADED: {
++   if (state.controlState !== 'Starting') return state
++
+    const newState = addTask(state, checkSession())
+</code></pre>
+<p>What we end up with:</p>
+<pre><code class="language-js">case APP_LOADED: {
+  if (state.controlState !== 'Starting') return state
+
+  const newState = addTask(state, checkSession())
+
+  return { ...newState, controlState: 'CheckingSession' }
+}
+</code></pre>
+<p>Next we&rsquo;ll handle the possible outcomes of the <code>GET /account</code> HTTP task: success (we have a session) or failure (we either don&rsquo;t have a session or can&rsquo;t find out due to network or server error).</p>
+<p>In case of success, we just want to display the main UI, so we set the appropriate control state and let <code>react-redux</code> or equivalent bring up the correct UI:</p>
+<pre><code class="language-js">case SESSION_SUCCESS: {
+  if (state.controlState !== 'CheckingSession') return state
+
+  return { ...state, controlState: 'Home' }
+}
+</code></pre>
+<p>The failure case needs a little more attention. If the HTTP request failed with a 401 code, then we know we&rsquo;re not authenticated and must show the login form. If it failed with any other error, we want to display the error and give the user a chance of retrying.</p>
+<p>(Note that the action payload carries the response body and the action meta carries the response status code.)</p>
+<pre><code class="language-js">case SESSION_FAILURE: {
+  if (state.controlState !== 'CheckingSession') return state
+
+  if (action.meta.status === 401) {
+    return { 
+      ...state, 
+      controlState: 'CollectingInput'
+    }
+  } else {
+    return { 
+      ...state, 
+      controlState: 'Error',
+      error: { 
+        message: action.payload,
+        retryState: 'CheckingSession',
+        retryTask: checkSession()
+      }
+    }
+  }
+}
+</code></pre>
+<p>Our reducer so far:</p>
+<pre><code class="language-js">const reducer = (state, action) =&gt; {
+  switch (action.type) {
+    case APP_LOADED: {
+      if (state.controlState !== 'Starting') return state
+
+      const newState = addTask(state, checkSession())
+
+      return { ...newState, controlState: 'CheckingSession' }
+    }
+
+    case SESSION_SUCCESS: {
+      if (state.controlState !== 'CheckingSession') return state
+
+      return { ...state, controlState: 'Home' }
+    }
+
+    case SESSION_FAILURE: {
+      if (state.controlState !== 'CheckingSession') return state
+
+      if (action.meta.status === 401) {
+        return { 
+          ...state, 
+          controlState: 'CollectingInput'
+        }
+      } else {
+        return { 
+          ...state, 
+          controlState: 'Error',
+          error: { 
+            message: action.payload,
+            retryState: 'CheckingSession',
+            retryTask: checkSession()
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+<h3 id="collecting-input">Collecting input<a class="headerlink" href="#collecting-input" title="Permanent link">&para;</a></h3>
+<p>If no session is present and we find ourselves in the <code>CollectingInput</code> state, it may be because the user accessed the app for the first time, or it may be because the user clicked on an email verification link resulting from a previous login attempt, thus in the <code>CollectingInput</code> state the UI will need to do two things:</p>
+<ol>
+<li>display the login form</li>
+<li>check the location bar for an email verification token</li>
+</ol>
+<p>If the token is there, the UI will dispatch a <code>TOKEN_PROVIDED</code> action; if not, it will wait for user input and then dispatch a <code>CREDENTIALS_ENTERED</code> action. (See the example app for a way of doing that with React.)</p>
+<p>Both actions imply an HTTP task, either to submit the request for a login link, or to verify the token. </p>
+<p>Submitting the request for a login link:</p>
+<pre><code class="language-js">const submitCredentials = (email) =&gt; ({
+  type: 'http',
+  method: 'post',
+  url: '/auth/email/requests',
+  body: { email },
+  actions: {
+    success: SUBMIT_CREDENTIALS_SUCCESS,
+    failure: SUBMIT_CREDENTIALS_FAILURE,
+  }
+}) 
+
+const reducer = (state, action) =&gt; {
+  switch (action.type) {
+    case CREDENTIALS_ENTERED: {
+      if (state.controlState !== 'CollectingInput') return state
+
+      const { email } = action.payload
+      const newState = addTask(state, submitCredentials(email))
+
+      return { ...newState, controlState: 'SubmittingCredentials' }
+    }
+</code></pre>
+<p>Verifying the token:</p>
+<pre><code class="language-js">const verifyToken = (token) =&gt; ({
+  type: 'http',
+  method: 'post',
+  url: '/auth/email/verifications',
+  body: { token },
+  actions: {
+    success: VERIFY_TOKEN_SUCCESS,
+    failure: VERIFY_TOKEN_FAILURE,
+  }
+}) 
+
+const reducer = (state, action) =&gt; {
+  switch (action.type) {
+    case TOKEN_PROVIDED: {
+      if (state.controlState !== 'CollectingInput') return state
+
+      const { token } = action.payload
+      const newState = addTask(state, verifyToken(token))
+
+      return { ...newState, controlState: 'VerifyingToken' }
+    }
+</code></pre>
+<h3 id="notice-a-pattern">Notice a pattern?<a class="headerlink" href="#notice-a-pattern" title="Permanent link">&para;</a></h3>
+<p>You&rsquo;ve probably noticed that each action handler going through similar steps:</p>
+<pre><code class="language-js">// Encapsulate task creation
+const taskCreator = (taskParams) =&gt; ({ ... })
+
+const reducer = (state, action) =&gt; {
+  switch (action.type) {
+    case ACTION: {
+      // Ignore action if invalid in the current control state
+      if (state.controlState !== 'StateWhereActionIsValid') return state
+
+      // If the flow requires a new task other than user input, initiate it
+      const newState = addTask(state, taskCreator(taskParams))
+
+      // Assign the appropriate control state and return
+      return { ...newState, controlState: 'SomeNextState' }
+    }
+</code></pre>
+<p>Most of the action handlers left to write follow the same pattern, so I&rsquo;ll refer you to the <a href="https://github.com/bard/redux-agent-login-tutorial/blob/master/src/reducers/login.js">reducer in the repository</a> instead of repeating the pattern again.</p>
+<p>One part however deserves some additional attention, and that is&hellip;</p>
+<h3 id="the-error-control-state-and-the-retry-action">The Error control state and the RETRY action<a class="headerlink" href="#the-error-control-state-and-the-retry-action" title="Permanent link">&para;</a></h3>
+<p><strong>TODO.</strong> See <a href="https://github.com/bard/redux-agent-login-tutorial/blob/master/src/reducers/login.js#L156">the repo</a>.</p>
+<p>To test for error states, modify the server response in <code>src/mocks.js</code>, for example from:</p>
+<pre><code class="language-js">  fetchMock.post('/auth/email/verifications', async () =&gt; {
+    await simulateNetworkDelay()
+    return { status: 200 }
+  })
+</code></pre>
+<p>To:</p>
+<pre><code class="language-js">  fetchMock.post('/auth/email/verifications', async () =&gt; {
+    await simulateNetworkDelay()
+    return { status: 400, { body: 'No such code' }}
+  })
+</code></pre>
+<h2 id="integrating-the-reducer">Integrating the reducer<a class="headerlink" href="#integrating-the-reducer" title="Permanent link">&para;</a></h2>
+<p><strong>TODO</strong>. See <a href="https://github.com/bard/redux-agent-login-tutorial/blob/master/src/reducers/index.js">the repo</a>.</p>
+<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
+<p>This is just one, and far from complete, way of implementing state charts with Redux. It can be improved in many ways which are not included here for brevity:</p>
+<ul>
+<li>The check at the beginning of each handler may be converted to a more expressive <code>assertControlState(state, 'CollectingInput')</code>. See this gist [TODO].</li>
+<li>Since control states are closely associated with tasks, we could host both in the same function and call it with e.g. <code>return CredentialsEntered(state)</code>. This would be a way of implementing <em>entry actions</em>.</li>
+<li>As the application grows, it&rsquo;s necessary to tell states of different flows apart. <code>Starting</code> would stay the same, but <code>CheckingSession</code> and <code>CollectingInput</code> may become <code>Auth:CheckingSession</code> and <code>Auth:CollectingInput</code>, and be joined by <code>Settings:CollectingInput</code>, <code>Settings:SubmittingUpdates</code>, <code>Main:BrowsingPosts</code>, <code>Main:WritingPost</code>, &hellip;</li>
+</ul>
+<h2 id="further-reading-about-redux-agent">Further reading about redux-agent<a class="headerlink" href="#further-reading-about-redux-agent" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://redux-agent.org/tutorial/">Tutorial</a> - Building a simple application to demonstrate usage of the HTTP task and general setup for using redux-agent</li>
+<li><a href="https://redux-agent.org/reference/http/">HTTP Task Refererence</a></li>
+</ul>
+<h2 id="further-reading-about-state-charts">Further reading about state charts<a class="headerlink" href="#further-reading-about-state-charts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://statecharts.github.io/">Welcome to the world of Statecharts</a> — An introduction to state charts</li>
+<li><a href="https://sketch.systems/">Sketch.systems</a> — Design state charts in the browser using simple markup and test the flows interactively</li>
+<li><a href="https://www.infoq.com/articles/robust-user-interfaces-with-state-machines/">Robust Engineering: User Interfaces You Can Trust with State
+Machines</a> — Not strictly about state charts but good rationale for using explicit state machines in UI design</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../immer-support/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Immer Support
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../../reference/http/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                HTTP
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2019 Massimiliano Mirra
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+  <div class="md-footer-social">
+    
+      
+      
+        
+        
+      
+      <a href="https://github.com/bard" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+      </a>
+    
+      
+      
+        
+        
+      
+      <a href="https://linkedin.com/in/massimilianomirra" target="_blank" rel="noopener" title="linkedin.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+      </a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.93c04032.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83e5331e.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: ['tabs'],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.8c7e0a7e.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/languages/diff.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/languages/javascript.min.js"></script>
+      
+        <script src="../../js/extra.js"></script>
+      
+    
+  </body>
+</html>

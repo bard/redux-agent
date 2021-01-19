@@ -1,0 +1,16 @@
+.md-source__facts,
+article > a.md-content__icon {
+  display: none;
+}
+
+code {
+  background: #eee;
+}
+
+.md-clipboard:before {
+  color: #888;
+}
+
+pre:hover .md-clipboard:before {
+  color: #eee;
+}
